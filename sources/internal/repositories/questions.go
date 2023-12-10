@@ -1,0 +1,30 @@
+package repositories
+
+import (
+	"shtem-api/sources/internal/core/domain"
+	postgresrepository "shtem-api/sources/internal/repositories/postgres"
+)
+
+type questionsRepository struct {
+	db postgresrepository.QuestionsDB
+}
+
+func (p *questionsRepository) Create(question *domain.Question) domain.Error {
+	return p.db.Create(question)
+}
+
+func (p *questionsRepository) Update(question *domain.Question) domain.Error {
+	return p.db.Update(question)
+}
+
+func (p *questionsRepository) Delete(question *domain.Question) domain.Error {
+	return p.db.Delete(question)
+}
+
+func (p *questionsRepository) FindByShtem(question *domain.Question) (*domain.Question, domain.Error) {
+	return p.db.FindByShtem(question)
+}
+
+func NewQuestionsRepository(db postgresrepository.QuestionsDB) *questionsRepository {
+	return &questionsRepository{db}
+}
