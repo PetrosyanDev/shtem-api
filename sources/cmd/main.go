@@ -8,6 +8,10 @@ import (
 
 	postgreclient "shtem-api/sources/internal/clients/postgresql"
 	"shtem-api/sources/internal/configs"
+	"shtem-api/sources/internal/core/domain"
+	"shtem-api/sources/internal/core/services"
+	"shtem-api/sources/internal/repositories"
+	postgresrepository "shtem-api/sources/internal/repositories/postgres"
 	"shtem-api/sources/internal/system"
 )
 
@@ -34,19 +38,29 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to connect with PostgresDB (%v)", err)
 	}
+	questionsDB := postgresrepository.NewQuestionsDB(appCtx, postgresDB)
 
-	log.Println("init databases")
-	// TODO / DOING
-	// postsDB := posgr.NewPostsDB(appCtx, mongoDB)
+	log.Println("init repositories")
+	questionsRepository := repositories.NewQuestionsRepository(questionsDB)
 
-	GetAllDataFromTable(appCtx, postgresDB, "hayoc_1")
+	log.Println("init services")
+	questionsService := services.NewQuestionsService(questionsRepository)
 
-	// opts := []api.APIServerOpt{}
-	// TODO
-	// if cfg.TLS {
-	// 	log.Println("using TLS")
-	// 	opts = append(opts, api.WithTLS(embd.NewEMBD().Certs))
-	// }
+	q := &domain.Question{
+		ShtemName: "hayoc_1",
+		ID:        12,
+		Bajin:     1,
+		Mas:       2,
+		Number:    3,
+		Text:      "Lalalala",
+		Options:   []string{"1) AA", "2) BB", "3) CC", "4) DD"},
+		Answers:   []int{1},
+	}
+
+	e := questionsService.Create(q)
+	if e != nil {
+		log.Fatalln(e.RawError().Error())
+	}
 
 }
 
