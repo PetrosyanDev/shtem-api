@@ -50,36 +50,40 @@ func (h *questionsHandler) Create() gin.HandlerFunc {
 
 // func (h *questionsHandler) Update() gin.HandlerFunc {
 // 	return func(ctx *gin.Context) {
+// 		// Bind Request
 // 		req := new(dto.UpdateQuestionRequest)
 // 		if err := ctx.BindJSON(req); err != nil {
-// 			log.Printf("postsHandler:Update (%v)", err)
+// 			log.Printf("questionsHandler:Update (%v)", err)
 // 			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
 // 			return
 // 		}
-// 		postID := ctx.Param("id")
-// 		if postID == "" {
+
+// 		// GET ID
+// 		questionID := ctx.Param("id")
+// 		if questionID == "" {
 // 			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
 // 			return
 // 		}
-// 		post, err := h.postsService.FindByID(postID)
+
+// 		question, err := h.questionsService.FindByID(questionID)
 // 		if err != nil {
-// 			log.Printf("postsHandler:Update (%v)", err.RawError())
+// 			log.Printf("questionsHandler:Update (%v)", err.RawError())
 // 			dto.WriteErrorResponse(ctx, err)
 // 			return
 // 		}
-// 		if err := req.ToDomain(post); err != nil {
-// 			log.Printf("postsHandler:Update (%v)", err.RawError())
+// 		if err := req.ToDomain(question); err != nil {
+// 			log.Printf("questionsHandler:Update (%v)", err.RawError())
 // 			dto.WriteErrorResponse(ctx, err)
 // 			return
 // 		}
-// 		if err := h.postsService.Update(post); err != nil {
-// 			log.Printf("postsHandler:Update (%v)", err.RawError())
+// 		if err := h.questionsService.Update(question); err != nil {
+// 			log.Printf("questionsHandler:Update (%v)", err.RawError())
 // 			dto.WriteErrorResponse(ctx, err)
 // 			return
 // 		}
-// 		resp := new(dto.PostResponse)
-// 		resp.FromDomain(post)
-// 		resp.FormatURLs(h.cfg, post)
+// 		resp := new(dto.questionResponse)
+// 		resp.FromDomain(question)
+// 		resp.FormatURLs(h.cfg, question)
 // 		dto.WriteResponse(ctx, resp)
 // 	}
 // }

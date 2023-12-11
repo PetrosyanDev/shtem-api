@@ -37,7 +37,6 @@ func (r *CreateQuestionRequest) ToDomain(p *domain.Question) domain.Error {
 
 // UPDATE
 type UpdateQuestionRequest struct {
-	ID        int      `json:"id" binding:"required"`
 	ShtemName string   `json:"shtemName"`
 	Bajin     int      `json:"bajin"`
 	Mas       int      `json:"mas"`
@@ -59,7 +58,6 @@ type UpdateQuestionResponce struct {
 }
 
 func (r *UpdateQuestionRequest) ToDomain(p *domain.Question) domain.Error {
-	p.ID = r.ID
 	p.ShtemName = r.ShtemName
 	p.Bajin = r.Bajin
 	p.Mas = r.Mas
