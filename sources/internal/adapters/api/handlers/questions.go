@@ -18,23 +18,30 @@ type questionsHandler struct {
 
 func (h *questionsHandler) Create() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		// Bind Request
 		req := new(dto.CreateQuestionRequest)
 		if err := ctx.BindJSON(req); err != nil {
 			log.Printf("questionsHandler:Create (%v)", err)
 			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
 			return
 		}
+
+		// Convert to question
 		question := new(domain.Question)
 		if err := req.ToDomain(question); err != nil {
-			log.Printf("questionsHandler:Create (%v)", err.RawError())
+			log.Printf("questionsHandler:Create (%s)", err.GetMessage())
 			dto.WriteErrorResponse(ctx, err)
 			return
 		}
+
+		// Create question
 		if err := h.questionsService.Create(question); err != nil {
-			log.Printf("questionsHandler:Create (%v)", err.RawError())
+			log.Printf("questionsHandler:Create (%s)", err.GetMessage())
 			dto.WriteErrorResponse(ctx, err)
 			return
 		}
+
+		// Responce
 		resp := new(dto.QuestionResponse)
 		resp.FromDomain(question)
 		dto.WriteResponse(ctx, resp, http.StatusCreated)

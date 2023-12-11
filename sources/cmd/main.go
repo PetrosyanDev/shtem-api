@@ -47,18 +47,19 @@ func main() {
 
 	q := &domain.Question{
 		ShtemName: "hayoc_1",
-		ID:        12,
 		Bajin:     1,
 		Mas:       2,
 		Number:    3,
-		Text:      "Lalalala",
-		Options:   []string{"1) AA", "2) BB", "3) CC", "4) DD"},
-		Answers:   []int{1},
 	}
 
-	e := questionsService.Create(q)
+	quest, e := questionsService.FindByShtem(q)
 	if e != nil {
-		log.Fatalln(e.RawError().Error())
+		log.Fatalln(e.GetMessage())
+	}
+
+	e = questionsService.Delete(quest)
+	if e != nil {
+		log.Fatalln(e.GetMessage())
 	}
 
 }
