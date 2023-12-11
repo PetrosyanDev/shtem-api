@@ -88,17 +88,26 @@ func (q *questionsDB) FindByShtem(question *domain.Question) (*domain.Question, 
 	if err := model.FromDomain(question); err != nil {
 		return nil, domain.NewError().SetError(err)
 	}
+
+	var result domain.Question
+
 	// FIND!
-	query := fmt.Sprintf("SELECT  FROM %s WHERE bajin=$1 AND mas=$2 AND number=$3", question.ShtemName)
-	res, err := q.db.Exec(q.ctx, query, question.Bajin, question.Mas, question.Number)
+	query := fmt.Sprintf("SELECT q_id, bajin, mas, q_number, text, options, answer FROM %s WHERE bajin=$1 AND mas=$2 AND q_number=$3", question.ShtemName)
+	err := q.db.QueryRow(q.ctx, query, question.Bajin, question.Mas, question.Number).
+		Scan(
+			&result.ID,
+			&result.Bajin,
+			&result.Mas,
+			&result.Number,
+			&result.Text,
+			&result.Options,
+			&result.Answers,
+		)
 	if err != nil {
 		return nil, domain.NewError().SetError(err)
 	}
 
-	rowsAffected := res.RowsAffected()
-	log.Printf("Deleted %d row\n", rowsAffected)
-
-	return nil, nil
+	return &result, nil
 }
 
 func NewQuestionsDB(ctx context.Context, db *postgreclient.PostgresDB) *questionsDB {

@@ -24,6 +24,9 @@ func (q *questionsService) Delete(question *domain.Question) domain.Error {
 	return err
 }
 
+/*
+Convert shtemName, Bajin, Mas, Number to full domain.Question Struct
+*/
 func (q *questionsService) FindByShtem(question *domain.Question) (*domain.Question, domain.Error) {
 	return q.questionsRepository.FindByShtem(question)
 }
