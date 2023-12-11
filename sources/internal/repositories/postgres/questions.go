@@ -7,7 +7,8 @@ import (
 	"log"
 	postgreclient "shtem-api/sources/internal/clients/postgresql"
 	"shtem-api/sources/internal/core/domain"
-	"shtem-api/sources/internal/repositories/postgres/models"
+
+	"github.com/jackc/pgx/v5"
 )
 
 type questionsDB struct {
@@ -16,11 +17,7 @@ type questionsDB struct {
 }
 
 func (q *questionsDB) Create(question *domain.Question) domain.Error {
-	model := new(models.Question)
-	err := model.FromDomain(question)
-	if err != nil {
-		return domain.NewError().SetError(err)
-	}
+
 	// INSERT!
 	query := fmt.Sprintf("INSERT INTO %s (bajin,mas,q_number,text,options,answer) VALUES ($1, $2, $3, $4, $5, $6)", question.ShtemName)
 	res, err := q.db.Exec(q.ctx, query,
@@ -40,11 +37,6 @@ func (q *questionsDB) Create(question *domain.Question) domain.Error {
 }
 
 func (q *questionsDB) Update(question *domain.Question) domain.Error {
-	model := new(models.Question)
-	err := model.FromDomain(question)
-	if err != nil {
-		return domain.NewError().SetError(err)
-	}
 
 	// UPDATE!
 	query := fmt.Sprintf("UPDATE %s SET bajin=$1, mas=$2, q_number=$3, text=$4, options=$5, answer=$6 WHERE id=$7", question.ShtemName)
@@ -67,27 +59,17 @@ func (q *questionsDB) Update(question *domain.Question) domain.Error {
 }
 
 func (q *questionsDB) Delete(question *domain.Question) domain.Error {
-	model := new(models.Question)
-	if err := model.FromDomain(question); err != nil {
-		return domain.NewError().SetError(err)
-	}
-	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", question.ShtemName)
-	res, err := q.db.Exec(q.ctx, query, question.ID)
+	// DELETE!
+	query := fmt.Sprintf("DELETE FROM %s WHERE q_id=$1", question.ShtemName)
+	_, err := q.db.Exec(q.ctx, query, question.ID)
 	if err != nil {
 		return domain.NewError().SetError(err)
 	}
 
-	rowsAffected := res.RowsAffected()
-	log.Printf("Deleted %d row\n", rowsAffected)
-	// DELETE!
 	return nil
 }
 
 func (q *questionsDB) FindByShtem(question *domain.Question) (*domain.Question, domain.Error) {
-	model := new(models.Question)
-	if err := model.FromDomain(question); err != nil {
-		return nil, domain.NewError().SetError(err)
-	}
 
 	var result domain.Question
 
@@ -103,9 +85,13 @@ func (q *questionsDB) FindByShtem(question *domain.Question) (*domain.Question, 
 			&result.Options,
 			&result.Answers,
 		)
-	if err != nil {
+	if err == pgx.ErrNoRows {
+		return nil, domain.ErrNoRows
+	} else if err != nil {
 		return nil, domain.NewError().SetError(err)
 	}
+
+	result.ShtemName = question.ShtemName
 
 	return &result, nil
 }
