@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 
@@ -62,32 +61,4 @@ func main() {
 		log.Fatalln(e.RawError().Error())
 	}
 
-}
-
-func GetAllDataFromTable(ctx context.Context, postgresDB *postgreclient.PostgresDB, tableName string) error {
-	rows, err := postgresDB.Query(ctx, fmt.Sprintf("SELECT * FROM %s", tableName))
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-
-	// Iterate through the result set
-	for rows.Next() {
-		var q_id, bajin, mas, number int
-		var text string
-		var options []string
-		var answer []int
-		if err := rows.Scan(&q_id, &bajin, &mas, &number, &text, &options, &answer); err != nil {
-			return err
-		}
-
-		// Process the data as needed
-		log.Println(q_id, bajin, mas, number, text, options, answer)
-	}
-
-	if err := rows.Err(); err != nil {
-		return err
-	}
-
-	return nil
 }

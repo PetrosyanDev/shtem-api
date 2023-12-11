@@ -71,6 +71,14 @@ func (q *questionsDB) Delete(question *domain.Question) domain.Error {
 	if err := model.FromDomain(question); err != nil {
 		return domain.NewError().SetError(err)
 	}
+	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", question.ShtemName)
+	res, err := q.db.Exec(q.ctx, query, question.ID)
+	if err != nil {
+		return domain.NewError().SetError(err)
+	}
+
+	rowsAffected := res.RowsAffected()
+	log.Printf("Deleted %d row\n", rowsAffected)
 	// DELETE!
 	return nil
 }
@@ -81,6 +89,15 @@ func (q *questionsDB) FindByShtem(question *domain.Question) (*domain.Question, 
 		return nil, domain.NewError().SetError(err)
 	}
 	// FIND!
+	query := fmt.Sprintf("SELECT  FROM %s WHERE bajin=$1 AND mas=$2 AND number=$3", question.ShtemName)
+	res, err := q.db.Exec(q.ctx, query, question.Bajin, question.Mas, question.Number)
+	if err != nil {
+		return nil, domain.NewError().SetError(err)
+	}
+
+	rowsAffected := res.RowsAffected()
+	log.Printf("Deleted %d row\n", rowsAffected)
+
 	return nil, nil
 }
 
