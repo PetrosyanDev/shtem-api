@@ -57,7 +57,7 @@ func main() {
 		log.Fatalln(e.GetMessage())
 	}
 
-	e = questionsService.Delete(quest)
+	e = questionsService.Delete(quest.ID)
 	if e != nil {
 		log.Fatalln(e.GetMessage())
 	}

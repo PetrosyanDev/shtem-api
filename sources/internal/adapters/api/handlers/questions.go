@@ -7,6 +7,7 @@ import (
 	"shtem-api/sources/internal/configs"
 	"shtem-api/sources/internal/core/domain"
 	"shtem-api/sources/internal/core/ports"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -48,42 +49,119 @@ func (h *questionsHandler) Create() gin.HandlerFunc {
 	}
 }
 
-// func (h *questionsHandler) Update() gin.HandlerFunc {
-// 	return func(ctx *gin.Context) {
-// 		// Bind Request
-// 		req := new(dto.UpdateQuestionRequest)
-// 		if err := ctx.BindJSON(req); err != nil {
-// 			log.Printf("questionsHandler:Update (%v)", err)
-// 			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
-// 			return
-// 		}
+func (h *questionsHandler) Update() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		// Bind Request
+		req := new(dto.UpdateQuestionRequest)
+		if err := ctx.BindJSON(req); err != nil {
+			log.Printf("questionsHandler:Update (%v)", err)
+			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
+			return
+		}
 
-// 		// GET ID
-// 		questionID := ctx.Param("id")
-// 		if questionID == "" {
-// 			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
-// 			return
-// 		}
+		// GET ID
+		questionID := ctx.Param("id")
+		if questionID == "" {
+			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
+			return
+		}
 
-// 		question, err := h.questionsService.FindByID(questionID)
-// 		if err != nil {
-// 			log.Printf("questionsHandler:Update (%v)", err.RawError())
-// 			dto.WriteErrorResponse(ctx, err)
-// 			return
-// 		}
-// 		if err := req.ToDomain(question); err != nil {
-// 			log.Printf("questionsHandler:Update (%v)", err.RawError())
-// 			dto.WriteErrorResponse(ctx, err)
-// 			return
-// 		}
-// 		if err := h.questionsService.Update(question); err != nil {
-// 			log.Printf("questionsHandler:Update (%v)", err.RawError())
-// 			dto.WriteErrorResponse(ctx, err)
-// 			return
-// 		}
-// 		resp := new(dto.questionResponse)
-// 		resp.FromDomain(question)
-// 		resp.FormatURLs(h.cfg, question)
-// 		dto.WriteResponse(ctx, resp)
-// 	}
-// }
+		id, _ := strconv.Atoi(questionID)
+
+		// FIND QUESTION
+		question, err := h.questionsService.FindByID(id)
+		if err != nil {
+			log.Printf("questionsHandler:Update (%v)", err.RawError())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		// UPDATE QUESTION
+		if err := h.questionsService.Update(question); err != nil {
+			log.Printf("questionsHandler:Update (%v)", err.RawError())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		resp := new(dto.QuestionResponse)
+		resp.FromDomain(question)
+		dto.WriteResponse(ctx, resp)
+	}
+}
+
+func (h *questionsHandler) Delete() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+		// GET ID
+		questionID := ctx.Param("id")
+		if questionID == "" {
+			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
+			return
+		}
+
+		id, _ := strconv.Atoi(questionID)
+
+		// FIND QUESTION
+		question, err := h.questionsService.FindByID(id)
+		if err != nil {
+			log.Printf("questionsHandler:Delete (%v)", err.RawError())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		// DELETE QUESTION
+		err = h.questionsService.Delete(id)
+		if err != nil {
+			log.Printf("questionsHandler:Delete (%v)", err.RawError())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		resp := new(dto.QuestionResponse)
+		resp.FromDomain(question)
+		dto.WriteResponse(ctx, resp)
+	}
+}
+
+func (h *questionsHandler) Find() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+		// Bind Request
+		req := new(dto.FindQuestionRequest)
+		if err := ctx.BindJSON(req); err != nil {
+			log.Printf("questionsHandler:Find (%v)", err)
+			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
+			return
+		}
+
+		// Convert to question
+		question := new(domain.Question)
+		if err := req.ToDomain(question); err != nil {
+			log.Printf("questionsHandler:Find (%s)", err.GetMessage())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		// FIND QUESTION
+		final_q, err := h.questionsService.FindByShtem(question)
+		if err != nil {
+			log.Printf("questionsHandler:Find (%v)", err.RawError())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		resp := new(dto.QuestionResponse)
+		resp.FromDomain(final_q)
+		dto.WriteResponse(ctx, resp)
+	}
+}
+
+func NewPostsHandler(
+	cfg *configs.Configs,
+	questionsService ports.QuestionsService,
+) *questionsHandler {
+	return &questionsHandler{
+		cfg,
+		questionsService,
+	}
+}

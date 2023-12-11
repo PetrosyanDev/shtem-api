@@ -4,7 +4,7 @@ import "shtem-api/sources/internal/core/domain"
 
 // CREATE
 type CreateQuestionRequest struct {
-	ShtemName string   `json:"shtemName" binding:"required"`
+	ShtemName string   `json:"shtemaran" binding:"required"`
 	Bajin     int      `json:"bajin" binding:"required"`
 	Mas       int      `json:"mas" binding:"required"`
 	Number    int      `json:"number" binding:"required"`
@@ -15,7 +15,7 @@ type CreateQuestionRequest struct {
 
 type CreateQuestionResponce struct {
 	ID        int      `json:"id"`
-	ShtemName string   `json:"shtemName"`
+	ShtemName string   `json:"shtemaran"`
 	Bajin     int      `json:"bajin"`
 	Mas       int      `json:"mas"`
 	Number    int      `json:"number"`
@@ -37,7 +37,7 @@ func (r *CreateQuestionRequest) ToDomain(p *domain.Question) domain.Error {
 
 // UPDATE
 type UpdateQuestionRequest struct {
-	ShtemName string   `json:"shtemName"`
+	ShtemName string   `json:"shtemaran"`
 	Bajin     int      `json:"bajin"`
 	Mas       int      `json:"mas"`
 	Number    int      `json:"number"`
@@ -48,7 +48,7 @@ type UpdateQuestionRequest struct {
 
 type UpdateQuestionResponce struct {
 	ID        int      `json:"id"`
-	ShtemName string   `json:"shtemName"`
+	ShtemName string   `json:"shtemaran"`
 	Bajin     int      `json:"bajin"`
 	Mas       int      `json:"mas"`
 	Number    int      `json:"number"`
@@ -71,12 +71,12 @@ func (r *UpdateQuestionRequest) ToDomain(p *domain.Question) domain.Error {
 // DELETE
 type DeleteQuestionRequest struct {
 	ID        int    `json:"id" binding:"required"`
-	ShtemName string `json:"shtemName" binding:"required"`
+	ShtemName string `json:"shtemaran" binding:"required"`
 }
 
 type DeleteQuestionResponce struct {
 	ID        int    `json:"id"`
-	ShtemName string `json:"shtemName"`
+	ShtemName string `json:"shtemaran"`
 }
 
 func (r *DeleteQuestionRequest) ToDomain(p *domain.Question) domain.Error {
@@ -87,14 +87,15 @@ func (r *DeleteQuestionRequest) ToDomain(p *domain.Question) domain.Error {
 
 // FIND
 type FindQuestionRequest struct {
-	ShtemName string `json:"shtemName" binding:"required"`
+	ShtemName string `json:"shtemaran" binding:"required"`
 	Bajin     int    `json:"bajin" binding:"required"`
 	Mas       int    `json:"mas" binding:"required"`
+	Number    int    `json:"number" binding:"required"`
 }
 
 type FindQuestionResponce struct {
 	ID        int      `json:"id"`
-	ShtemName string   `json:"shtemName"`
+	ShtemName string   `json:"shtemaran"`
 	Bajin     int      `json:"bajin"`
 	Mas       int      `json:"mas"`
 	Number    int      `json:"number"`
@@ -107,13 +108,14 @@ func (r *FindQuestionRequest) ToDomain(p *domain.Question) domain.Error {
 	p.ShtemName = r.ShtemName
 	p.Bajin = r.Bajin
 	p.Mas = r.Mas
+	p.Number = r.Number
 	return nil
 }
 
 // Globals
 type QuestionResponseData struct {
 	ID        int      `json:"id"`
-	ShtemName string   `json:"shtemName"`
+	ShtemName string   `json:"shtemaran"`
 	Bajin     int      `json:"bajin"`
 	Mas       int      `json:"mas"`
 	Number    int      `json:"number"`
