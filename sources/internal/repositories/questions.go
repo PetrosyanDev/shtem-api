@@ -17,8 +17,8 @@ func (p *questionsRepository) Update(question *domain.Question) domain.Error {
 	return p.db.Update(question)
 }
 
-func (p *questionsRepository) Delete(question *domain.Question) domain.Error {
-	return p.db.Delete(question)
+func (p *questionsRepository) Delete(id int) domain.Error {
+	return p.db.Delete(id)
 }
 
 func (p *questionsRepository) FindByShtem(question *domain.Question) (*domain.Question, domain.Error) {

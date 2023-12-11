@@ -19,8 +19,8 @@ func (q *questionsService) Update(question *domain.Question) domain.Error {
 	return err
 }
 
-func (q *questionsService) Delete(question *domain.Question) domain.Error {
-	err := q.questionsRepository.Delete(question)
+func (q *questionsService) Delete(id int) domain.Error {
+	err := q.questionsRepository.Delete(id)
 	return err
 }
 

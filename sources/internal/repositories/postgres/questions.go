@@ -106,10 +106,14 @@ func (q *questionsDB) Update(question *domain.Question) domain.Error {
 // DELETE!
 // DELETE!
 // DELETE!
-func (q *questionsDB) Delete(question *domain.Question) domain.Error {
+func (q *questionsDB) Delete(id int) domain.Error {
 	// DELETE!
-	query := fmt.Sprintf("DELETE FROM %s WHERE q_id=$1", question.ShtemName)
-	_, err := q.db.Exec(q.ctx, query, question.ID)
+	query := fmt.Sprintf("DELETE FROM %s WHERE %s=$1", questionsTableName,
+		questionsTableComponents.q_id,
+	)
+	_, err := q.db.Exec(q.ctx, query,
+		id,
+	)
 	if err != nil {
 		return domain.NewError().SetError(err)
 	}
