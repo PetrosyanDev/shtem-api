@@ -130,6 +130,7 @@ type QuestionResponse struct {
 
 func (r *QuestionResponse) FromDomain(p *domain.Question) {
 	r.Data = new(QuestionResponseData)
+	r.Data.ID = p.ID
 	r.Data.ShtemName = p.ShtemName
 	r.Data.Bajin = p.Bajin
 	r.Data.Mas = p.Mas

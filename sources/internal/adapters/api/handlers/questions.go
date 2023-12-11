@@ -156,7 +156,7 @@ func (h *questionsHandler) Find() gin.HandlerFunc {
 	}
 }
 
-func NewPostsHandler(
+func NewQuestionsHandler(
 	cfg *configs.Configs,
 	questionsService ports.QuestionsService,
 ) *questionsHandler {

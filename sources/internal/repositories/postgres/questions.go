@@ -4,7 +4,6 @@ package postgresrepository
 import (
 	"context"
 	"fmt"
-	"log"
 	postgreclient "shtem-api/sources/internal/clients/postgresql"
 	"shtem-api/sources/internal/core/domain"
 
@@ -52,7 +51,7 @@ func (q *questionsDB) Create(question *domain.Question) domain.Error {
 		questionsTableComponents.options,
 		questionsTableComponents.answers,
 	)
-	res, err := q.db.Exec(q.ctx, query,
+	_, err := q.db.Exec(q.ctx, query,
 		question.ShtemName,
 		question.Bajin,
 		question.Mas,
@@ -64,8 +63,7 @@ func (q *questionsDB) Create(question *domain.Question) domain.Error {
 	if err != nil {
 		return domain.NewError().SetError(err)
 	}
-	rowsAffected := res.RowsAffected()
-	log.Printf("Inserted %d rows\n", rowsAffected)
+
 	return nil
 }
 
@@ -84,7 +82,7 @@ func (q *questionsDB) Update(question *domain.Question) domain.Error {
 		questionsTableComponents.answers,
 		questionsTableComponents.q_id, // for identifying the question to update
 	)
-	res, err := q.db.Exec(q.ctx, query,
+	_, err := q.db.Exec(q.ctx, query,
 		question.ShtemName,
 		question.Bajin,
 		question.Mas,
@@ -97,9 +95,6 @@ func (q *questionsDB) Update(question *domain.Question) domain.Error {
 	if err != nil {
 		return domain.NewError().SetError(err)
 	}
-
-	rowsAffected := res.RowsAffected()
-	log.Printf("Updated %d rows\n", rowsAffected)
 	return nil
 }
 
@@ -129,7 +124,7 @@ func (q *questionsDB) FindByShtem(question *domain.Question) (*domain.Question, 
 	var result domain.Question
 
 	// FIND!
-	query := fmt.Sprintf("SELECT %s, %s, %s, %s, %s, %s, %s, %s FROM %s WHERE %s=$1 AND %s=$2 AND %s=$3",
+	query := fmt.Sprintf("SELECT %s, %s, %s, %s, %s, %s, %s, %s FROM %s WHERE %s=$1 AND %s=$2 AND %s=$3 AND %s=$4",
 		questionsTableComponents.q_id,
 		questionsTableComponents.shtemaran,
 		questionsTableComponents.bajin,
@@ -138,12 +133,13 @@ func (q *questionsDB) FindByShtem(question *domain.Question) (*domain.Question, 
 		questionsTableComponents.text,
 		questionsTableComponents.options,
 		questionsTableComponents.answers,
-		questionsTableName,                // TABLE NAME
-		questionsTableComponents.bajin,    // WHERE BAJIN =
-		questionsTableComponents.mas,      // WHERE MAS =
-		questionsTableComponents.q_number, // WHERE Q_NUMBER =
+		questionsTableName,                 // TABLE NAME
+		questionsTableComponents.shtemaran, // WHERE BAJIN =
+		questionsTableComponents.bajin,     // WHERE BAJIN =
+		questionsTableComponents.mas,       // WHERE MAS =
+		questionsTableComponents.q_number,  // WHERE Q_NUMBER =
 	)
-	err := q.db.QueryRow(q.ctx, query, question.Bajin, question.Mas, question.Number).
+	err := q.db.QueryRow(q.ctx, query, question.ShtemName, question.Bajin, question.Mas, question.Number).
 		Scan(
 			&result.ID,
 			&result.ShtemName,
@@ -159,8 +155,6 @@ func (q *questionsDB) FindByShtem(question *domain.Question) (*domain.Question, 
 	} else if err != nil {
 		return nil, domain.NewError().SetError(err)
 	}
-
-	result.ShtemName = question.ShtemName
 
 	return &result, nil
 }

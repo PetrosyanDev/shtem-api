@@ -7,6 +7,7 @@ var (
 	ErrAccessDenied = NewError().SetStatus(http.StatusForbidden).SetMessage("ERR_ACCESS_DENIED")
 	ErrBadRequest   = NewError().SetStatus(http.StatusBadRequest).SetMessage("ERR_BAD_REQUEST_PARAMS")
 	ErrNoRows       = NewError().SetStatus(http.StatusBadRequest).SetMessage("ERR_BAD_REQUEST_PARAMS_1")
+	ErrRequestPath  = NewError().SetStatus(http.StatusBadRequest).SetMessage("ERR_INVALID_REQUEST_PATH")
 )
 
 type Error interface {
