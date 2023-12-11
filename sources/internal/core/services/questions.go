@@ -31,6 +31,10 @@ func (q *questionsService) FindByShtem(question *domain.Question) (*domain.Quest
 	return q.questionsRepository.FindByShtem(question)
 }
 
+func (q *questionsService) FindByID(id int) (*domain.Question, domain.Error) {
+	return q.questionsRepository.FindByID(id)
+}
+
 func NewQuestionsService(questionsRepository repositories.QuestionsRepository) *questionsService {
 	return &questionsService{questionsRepository}
 }

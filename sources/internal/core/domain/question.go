@@ -1,8 +1,8 @@
 package domain
 
 type Question struct {
-	ShtemName string
 	ID        int
+	ShtemName string
 	Bajin     int
 	Mas       int
 	Number    int

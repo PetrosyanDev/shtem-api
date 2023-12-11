@@ -8,4 +8,5 @@ type QuestionsDB interface {
 	Update(question *domain.Question) domain.Error
 	Delete(question *domain.Question) domain.Error
 	FindByShtem(question *domain.Question) (*domain.Question, domain.Error)
+	FindByID(id int) (*domain.Question, domain.Error)
 }
