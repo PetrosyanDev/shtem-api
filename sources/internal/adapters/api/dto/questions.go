@@ -94,7 +94,6 @@ type FindQuestionRequest struct {
 }
 
 type FindQuestionResponce struct {
-	ID        int      `json:"id"`
 	ShtemName string   `json:"shtemaran"`
 	Bajin     int      `json:"bajin"`
 	Mas       int      `json:"mas"`
