@@ -17,7 +17,7 @@ const maxConcurrentCon int = 10
 
 var (
 	allowedHeaders = []string{
-		"X-Forwarded-For", "X-Shtem-Api-Key", "X-Shtem-Access-Token", "X-Language", "X-Timezone",
+		"X-Forwarded-For", "X-Shtem-Api-Key", "Content-Type", "X-Shtem-Access-Token", "X-Language", "X-Timezone",
 	}
 	allowedMethods = []string{
 		"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS",
