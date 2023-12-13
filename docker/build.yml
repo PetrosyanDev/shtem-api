@@ -4,7 +4,7 @@ services:
   shtem-api:
     container_name: ${IMG}
     build:
-      context: ../
-      dockerfile: ./docker/Dockerfile
+      context: ./
+      dockerfile: ./Dockerfile
       target: main
     image: ${IMG}:${TAG}
