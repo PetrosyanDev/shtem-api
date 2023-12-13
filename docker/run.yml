@@ -14,7 +14,7 @@ services:
 
 secrets:
   api_shtem_app_cfg:
-    name: api_shtem_app_cfg_v1
+    name: api_shtem_app_cfg_v2
     file: ${DIR}/secrets.json
 
 networks:
