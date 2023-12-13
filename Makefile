@@ -56,6 +56,14 @@ build: test pull
 # 	ssh ${DEV_HOST} -p ${SSH_PORT} "docker push ${REGISTRY}/${IMAGE}:${RELEASE_VERSION}"
 	@echo "BUILT IMAGE: ${IMAGE}:${RELEASE_VERSION}"
 
+build-prd: test
+	mkdir -p build/api
+	cd sources/cmd && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ../../build/api/app
+	scp -P ${SSH_PORT} -r docker ${DEV_HOST}:${DEV_BASE}/${DEPLOY_DIR}/
+	scp -P ${SSH_PORT} -r build ${DEV_HOST}:${DEV_BASE}/${DEPLOY_DIR}/
+	ssh ${DEV_HOST} -p ${SSH_PORT} "IMG=${IMAGE} TAG=${RELEASE_VERSION} docker-compose -f ${DEPLOY_DIR}/docker/build.yml build"
+	@echo "BUILT IMAGE: ${IMAGE}:${RELEASE_VERSION}"
+
 ## Building and Deploying on Staging
 deploy-dev: build
 	scp -P ${SSH_PORT} secrets/dev.json ${DEV_HOST}:${DEV_BASE}/${DEPLOY_DIR}/secrets.json
@@ -64,12 +72,11 @@ deploy-dev: build
 	@echo "DEPLOYED on STAGING! VERSION is: ${RELEASE_VERSION}"
 
 ## Building and Deploying on Production
-deploy-prd: build
+deploy-prd: build-prd
 	ssh ${PRD_HOST} -p ${SSH_PORT} "mkdir -p ${DEPLOY_DIR}/docker"
 	scp -P ${SSH_PORT} -r docker/run.yml ${PRD_HOST}:${PRD_BASE}/${DEPLOY_DIR}/docker/
 	scp -P ${SSH_PORT} secrets/prd.json ${PRD_HOST}:${PRD_BASE}/${DEPLOY_DIR}/secrets.json
-	ssh ${PRD_HOST} -p ${SSH_PORT} "docker pull ${REGISTRY}/${IMAGE}:${RELEASE_VERSION}"
-	ssh ${PRD_HOST} -p ${SSH_PORT} "REPO=${REGISTRY} IMG=${IMAGE} TAG=${RELEASE_VERSION} DIR=${PRD_BASE}/${DEPLOY_DIR} MODE=release NONS=${NONSENCE} docker stack deploy -c ${DEPLOY_DIR}/docker/run.yml imedcs --with-registry-auth"
+	ssh ${PRD_HOST} -p ${SSH_PORT} "IMG=${IMAGE} TAG=${RELEASE_VERSION} DIR=${PRD_BASE}/${DEPLOY_DIR} MODE=release NONS=${NONSENCE} docker stack deploy -c ${DEPLOY_DIR}/docker/run.yml imedcs --with-registry-auth"
 	ssh ${PRD_HOST} -p ${SSH_PORT} "rm -f ${DEPLOY_DIR}/secrets.json"
 	@echo "DEPLOYED on PRODUCTION! VERSION is: ${RELEASE_VERSION}"
 

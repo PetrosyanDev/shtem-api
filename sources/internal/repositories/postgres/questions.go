@@ -124,8 +124,7 @@ func (q *questionsDB) FindByShtem(question *domain.Question) (*domain.Question, 
 	var result domain.Question
 
 	// FIND!
-	query := fmt.Sprintf("SELECT %s, %s, %s, %s, %s, %s, %s, %s FROM %s WHERE %s=$1 AND %s=$2 AND %s=$3 AND %s=$4",
-		questionsTableComponents.q_id,
+	query := fmt.Sprintf("SELECT %s, %s, %s, %s, %s, %s, %s FROM %s WHERE %s=$1 AND %s=$2 AND %s=$3 AND %s=$4",
 		questionsTableComponents.shtemaran,
 		questionsTableComponents.bajin,
 		questionsTableComponents.mas,
@@ -141,7 +140,6 @@ func (q *questionsDB) FindByShtem(question *domain.Question) (*domain.Question, 
 	)
 	err := q.db.QueryRow(q.ctx, query, question.ShtemName, question.Bajin, question.Mas, question.Number).
 		Scan(
-			&result.ID,
 			&result.ShtemName,
 			&result.Bajin,
 			&result.Mas,
