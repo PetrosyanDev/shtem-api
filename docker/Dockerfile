@@ -1,4 +1,4 @@
-FROM golang:1.21-alpine as main
+FROM debian:bullseye-slim as main
 LABEL author="ERIK_PETROSYAN"
 LABEL description="shtem-api"
 RUN addgroup --system erik && adduser --system --ingroup erik erik
