@@ -113,14 +113,14 @@ func (r *FindQuestionRequest) ToDomain(p *domain.Question) domain.Error {
 
 // Globals
 type QuestionResponseData struct {
-	ID        int      `json:"id"`
-	ShtemName string   `json:"shtemaran"`
-	Bajin     int      `json:"bajin"`
-	Mas       int      `json:"mas"`
-	Number    int      `json:"number"`
-	Text      string   `json:"text"`
-	Options   []string `json:"options"`
-	Answers   []int    `json:"answers"`
+	ID        int      `json:"id,omitempty"`
+	ShtemName string   `json:"shtemaran,omitempty"`
+	Bajin     int      `json:"bajin,omitempty"`
+	Mas       int      `json:"mas,omitempty"`
+	Number    int      `json:"number,omitempty"`
+	Text      string   `json:"text,omitempty"`
+	Options   []string `json:"options,omitempty"`
+	Answers   []int    `json:"answers,omitempty"`
 }
 
 type QuestionResponse struct {
