@@ -4,8 +4,8 @@ ROLLBACK_VERSION=1.0.0
 
 GIT_REPO=git@github.com:PetrosyanDev/shtem-api.git
 GIT_BLD_BRANCH=main
-DEV_HOST=erik@165.227.148.29
-PRD_HOST=erik@165.227.148.29
+DEV_HOST=erik@shtemaran.am
+PRD_HOST=erik@shtemaran.am
 DEV_BASE=/home/erik
 PRD_BASE=/home/erik
 SSH_PORT=22
@@ -49,7 +49,7 @@ run:
 
 build: test pull
 	mkdir -p build/api
-	cd sources/cmd/api && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ../../../build/api/app
+	cd sources/cmd && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ../../build/api/app
 	scp -P ${SSH_PORT} -r build ${DEV_HOST}:${DEV_BASE}/${DEPLOY_DIR}/
 	ssh ${DEV_HOST} -p ${SSH_PORT} "IMG=${IMAGE} TAG=${RELEASE_VERSION} docker-compose -f ${DEPLOY_DIR}/docker/build.yml build"
 # 	ssh ${DEV_HOST} -p ${SSH_PORT} "docker tag ${IMAGE}:${RELEASE_VERSION} ${REGISTRY}/${IMAGE}:${RELEASE_VERSION}"
@@ -58,9 +58,8 @@ build: test pull
 
 ## Building and Deploying on Staging
 deploy-dev: build
-	ssh ${DEV_HOST} -p ${SSH_PORT} "docker pull ${REGISTRY}/${IMAGE}:${RELEASE_VERSION}"
 	scp -P ${SSH_PORT} secrets/dev.json ${DEV_HOST}:${DEV_BASE}/${DEPLOY_DIR}/secrets.json
-	ssh ${DEV_HOST} -p ${SSH_PORT} "REPO=${REGISTRY} IMG=${IMAGE} TAG=${RELEASE_VERSION} DIR=${DEV_BASE}/${DEPLOY_DIR} MODE=debug NONS=${NONSENCE} docker stack deploy -c ${DEPLOY_DIR}/docker/run.yml imedcs --with-registry-auth"
+	ssh ${DEV_HOST} -p ${SSH_PORT} "IMG=${IMAGE} TAG=${RELEASE_VERSION} DIR=${DEV_BASE}/${DEPLOY_DIR} docker stack deploy -c ${DEPLOY_DIR}/docker/run.yml erik --with-registry-auth"
 	ssh ${DEV_HOST} -p ${SSH_PORT} "rm -f ${DEPLOY_DIR}/secrets.json"
 	@echo "DEPLOYED on STAGING! VERSION is: ${RELEASE_VERSION}"
 

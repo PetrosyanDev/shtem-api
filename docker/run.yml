@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  shtem-api:
+    image: ${IMG}:${TAG}
+    user: erik:erik
+    deploy:
+      replicas: 1
+    secrets:
+      - api_shtem_app_cfg
+    networks:
+      - erik_internal_net
+    command: ./cmd/api/app --cfg /run/secrets/api_shtem_app_cfg
+
+secrets:
+  api_shtem_app_cfg:
+    name: api_shtem_app_cfg_v1
+    file: ${DIR}/secrets.json
+
+networks:
+  erik_internal_net:
+    driver: overlay
