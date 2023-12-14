@@ -76,15 +76,9 @@ deploy-prd: build-prd
 	ssh ${PRD_HOST} -p ${SSH_PORT} "mkdir -p ${DEPLOY_DIR}/docker"
 	scp -P ${SSH_PORT} -r docker/run.yml ${PRD_HOST}:${PRD_BASE}/${DEPLOY_DIR}/docker/
 	scp -P ${SSH_PORT} secrets/prd.json ${PRD_HOST}:${PRD_BASE}/${DEPLOY_DIR}/secrets.json
-	ssh ${PRD_HOST} -p ${SSH_PORT} "IMG=${IMAGE} TAG=${RELEASE_VERSION} DIR=${PRD_BASE}/${DEPLOY_DIR} MODE=release NONS=${NONSENCE} docker stack deploy -c ${DEPLOY_DIR}/docker/run.yml imedcs --with-registry-auth"
+	ssh ${PRD_HOST} -p ${SSH_PORT} "IMG=${IMAGE} TAG=${RELEASE_VERSION} DIR=${PRD_BASE}/${DEPLOY_DIR} MODE=release docker stack deploy -c ${DEPLOY_DIR}/docker/run.yml erik --with-registry-auth"
 	ssh ${PRD_HOST} -p ${SSH_PORT} "rm -f ${DEPLOY_DIR}/secrets.json"
 	@echo "DEPLOYED on PRODUCTION! VERSION is: ${RELEASE_VERSION}"
-
-## Rolling Back on Production by one deploy
-revert:
-	ssh ${PRD_HOST} -p ${SSH_PORT} "docker pull ${REGISTRY}/${IMAGE}:${ROLLBACK_VERSION}"
-	ssh ${PRD_HOST} -p ${SSH_PORT} "docker service update --image ${REGISTRY}/${IMAGE}:${ROLLBACK_VERSION} --force imedcs_${IMAGE} --with-registry-auth"
-	@echo "ROLLED BACK on PRODUCTION! now VERSION is: ${ROLLBACK_VERSION}"
 
 ## Purge Docker Caches on Build Server
 cleanup:
