@@ -6,7 +6,7 @@ import "net/http"
 var (
 	ErrAccessDenied = NewError().SetStatus(http.StatusForbidden).SetMessage("ERR_ACCESS_DENIED")
 	ErrBadRequest   = NewError().SetStatus(http.StatusBadRequest).SetMessage("ERR_BAD_REQUEST_PARAMS")
-	ErrNoRows       = NewError().SetStatus(http.StatusBadRequest).SetMessage("ERR_BAD_REQUEST_PARAMS_1")
+	ErrNoRows       = NewError().SetStatus(http.StatusBadRequest).SetMessage("ERR_NO_ROWS_FOUND")
 	ErrRequestPath  = NewError().SetStatus(http.StatusBadRequest).SetMessage("ERR_INVALID_REQUEST_PATH")
 )
 
