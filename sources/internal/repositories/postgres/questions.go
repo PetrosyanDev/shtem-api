@@ -119,7 +119,7 @@ func (q *questionsDB) Delete(id int) domain.Error {
 // FINDBYSHTEM
 // FINDBYSHTEM
 // FINDBYSHTEM
-func (q *questionsDB) FindByShtem(question *domain.Question) (*domain.Question, domain.Error) {
+func (q *questionsDB) FindQuestionByNumber(question *domain.Question) (*domain.Question, domain.Error) {
 
 	var result domain.Question
 
@@ -155,6 +155,57 @@ func (q *questionsDB) FindByShtem(question *domain.Question) (*domain.Question, 
 	}
 
 	return &result, nil
+}
+
+func (q *questionsDB) FindBajin(question *domain.Question) ([]*domain.Question, domain.Error) {
+
+	// FIND!
+	query := fmt.Sprintf(`
+			SELECT %s, %s, %s, %s, %s, %s, %s 
+			FROM %s 
+			WHERE %s=$1
+			ORDER BY %s, %s`,
+		questionsTableComponents.shtemaran,
+		questionsTableComponents.bajin,
+		questionsTableComponents.mas,
+		questionsTableComponents.q_number,
+		questionsTableComponents.text,
+		questionsTableComponents.options,
+		questionsTableComponents.answers,
+		questionsTableName,                // TABLE NAME
+		questionsTableComponents.bajin,    // WHERE BAJIN =
+		questionsTableComponents.mas,      // Sort by
+		questionsTableComponents.q_number, // Sort by
+	)
+	rows, err := q.db.Query(q.ctx, query, question.Bajin)
+	if err == pgx.ErrNoRows {
+		return nil, domain.ErrNoRows
+	} else if err != nil {
+		return nil, domain.NewError().SetError(err)
+	}
+	defer rows.Close()
+
+	var outputQuestions []*domain.Question
+
+	for rows.Next() {
+		var result domain.Question
+		// Scan the row data into the result struct
+		if err := rows.Scan(
+			&result.ShtemName,
+			&result.Bajin,
+			&result.Mas,
+			&result.Number,
+			&result.Text,
+			&result.Options,
+			&result.Answers,
+		); err != nil {
+			return nil, domain.ErrBadRequest
+		}
+
+		outputQuestions = append(outputQuestions, &result)
+	}
+
+	return outputQuestions, nil
 }
 
 // FINDBYID!
