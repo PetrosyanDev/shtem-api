@@ -21,8 +21,12 @@ func (p *questionsRepository) Delete(id int) domain.Error {
 	return p.db.Delete(id)
 }
 
-func (p *questionsRepository) FindByShtem(question *domain.Question) (*domain.Question, domain.Error) {
-	return p.db.FindByShtem(question)
+func (p *questionsRepository) FindBajin(question *domain.Question) ([]*domain.Question, domain.Error) {
+	return p.db.FindBajin(question)
+}
+
+func (p *questionsRepository) FindQuestionByNumber(question *domain.Question) (*domain.Question, domain.Error) {
+	return p.db.FindQuestionByNumber(question)
 }
 
 func (p *questionsRepository) FindByID(id int) (*domain.Question, domain.Error) {
