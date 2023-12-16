@@ -20,7 +20,8 @@ func NewAPIRouter(cfg *configs.Configs, questionsHandler handlers.QuestionsHandl
 	{
 		posts := apiV1.Group("/questions")
 		posts.POST("/create", questionsHandler.Create())
-		posts.POST("/find", questionsHandler.Find())
+		posts.POST("/find", questionsHandler.FindQuestion())
+		posts.POST("/findBajin", questionsHandler.FindBajin())
 		posts.POST("/:id/update", questionsHandler.Update())
 		posts.DELETE("/:id/delete", questionsHandler.Delete())
 	}

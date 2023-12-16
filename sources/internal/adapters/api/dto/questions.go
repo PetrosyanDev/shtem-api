@@ -1,6 +1,8 @@
 package dto
 
-import "shtem-api/sources/internal/core/domain"
+import (
+	"shtem-api/sources/internal/core/domain"
+)
 
 // CREATE
 type CreateQuestionRequest struct {
@@ -127,6 +129,10 @@ type QuestionResponse struct {
 	Response[QuestionResponseData]
 }
 
+type BajinResponse struct {
+	Response[[]QuestionResponseData]
+}
+
 func (r *QuestionResponse) FromDomain(p *domain.Question) {
 	r.Data = new(QuestionResponseData)
 	r.Data.ID = p.ID
@@ -137,4 +143,25 @@ func (r *QuestionResponse) FromDomain(p *domain.Question) {
 	r.Data.Text = p.Text
 	r.Data.Options = p.Options
 	r.Data.Answers = p.Answers
+}
+
+func (r *BajinResponse) SliceFromDomain(p []*domain.Question) {
+	// Initialize r.Data as a pointer to a slice
+	r.Data = new([]QuestionResponseData)
+
+	// Initialize the underlying slice
+	*r.Data = make([]QuestionResponseData, len(p))
+
+	for index, q := range p {
+		(*r.Data)[index] = QuestionResponseData{
+			ID:        q.ID,
+			ShtemName: q.ShtemName,
+			Bajin:     q.Bajin,
+			Mas:       q.Mas,
+			Number:    q.Number,
+			Text:      q.Text,
+			Options:   q.Options,
+			Answers:   q.Answers,
+		}
+	}
 }
