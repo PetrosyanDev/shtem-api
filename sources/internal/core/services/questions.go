@@ -27,8 +27,12 @@ func (q *questionsService) Delete(id int) domain.Error {
 /*
 Convert shtemName, Bajin, Mas, Number to full domain.Question Struct
 */
-func (q *questionsService) FindByShtem(question *domain.Question) (*domain.Question, domain.Error) {
-	return q.questionsRepository.FindByShtem(question)
+func (q *questionsService) FindQuestionByNumber(question *domain.Question) (*domain.Question, domain.Error) {
+	return q.questionsRepository.FindQuestionByNumber(question)
+}
+
+func (q *questionsService) FindBajin(question *domain.Question) ([]*domain.Question, domain.Error) {
+	return q.questionsRepository.FindBajin(question)
 }
 
 func (q *questionsService) FindByID(id int) (*domain.Question, domain.Error) {
