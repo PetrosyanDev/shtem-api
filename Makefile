@@ -47,14 +47,14 @@ run:
 # run-tls: test
 # 	@NONSENCE=${NONSENCE} go run imedcs/... --tls --cfg secrets/local.json
 
-build: test pull
-	mkdir -p build/api
-	cd sources/cmd && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ../../build/api/app
-	scp -P ${SSH_PORT} -r build ${DEV_HOST}:${DEV_BASE}/${DEPLOY_DIR}/
-	ssh ${DEV_HOST} -p ${SSH_PORT} "IMG=${IMAGE} TAG=${RELEASE_VERSION} docker-compose -f ${DEPLOY_DIR}/docker/build.yml build"
-# 	ssh ${DEV_HOST} -p ${SSH_PORT} "docker tag ${IMAGE}:${RELEASE_VERSION} ${REGISTRY}/${IMAGE}:${RELEASE_VERSION}"
-# 	ssh ${DEV_HOST} -p ${SSH_PORT} "docker push ${REGISTRY}/${IMAGE}:${RELEASE_VERSION}"
-	@echo "BUILT IMAGE: ${IMAGE}:${RELEASE_VERSION}"
+# build: test pull
+# 	mkdir -p build/api
+# 	cd sources/cmd && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ../../build/api/app
+# 	scp -P ${SSH_PORT} -r build ${DEV_HOST}:${DEV_BASE}/${DEPLOY_DIR}/
+# 	ssh ${DEV_HOST} -p ${SSH_PORT} "IMG=${IMAGE} TAG=${RELEASE_VERSION} docker-compose -f ${DEPLOY_DIR}/docker/build.yml build"
+# # 	ssh ${DEV_HOST} -p ${SSH_PORT} "docker tag ${IMAGE}:${RELEASE_VERSION} ${REGISTRY}/${IMAGE}:${RELEASE_VERSION}"
+# # 	ssh ${DEV_HOST} -p ${SSH_PORT} "docker push ${REGISTRY}/${IMAGE}:${RELEASE_VERSION}"
+# 	@echo "BUILT IMAGE: ${IMAGE}:${RELEASE_VERSION}"
 
 build-prd: test
 	mkdir -p build/api
@@ -64,21 +64,25 @@ build-prd: test
 	ssh ${DEV_HOST} -p ${SSH_PORT} "IMG=${IMAGE} TAG=${RELEASE_VERSION} docker-compose -f ${DEPLOY_DIR}/docker/build.yml build"
 	@echo "BUILT IMAGE: ${IMAGE}:${RELEASE_VERSION}"
 
-## Building and Deploying on Staging
-deploy-dev: build
-	scp -P ${SSH_PORT} secrets/dev.json ${DEV_HOST}:${DEV_BASE}/${DEPLOY_DIR}/secrets.json
-	ssh ${DEV_HOST} -p ${SSH_PORT} "IMG=${IMAGE} TAG=${RELEASE_VERSION} DIR=${DEV_BASE}/${DEPLOY_DIR} docker stack deploy -c ${DEPLOY_DIR}/docker/run.yml erik --with-registry-auth"
-	ssh ${DEV_HOST} -p ${SSH_PORT} "rm -f ${DEPLOY_DIR}/secrets.json"
-	@echo "DEPLOYED on STAGING! VERSION is: ${RELEASE_VERSION}"
+# ## Building and Deploying on Staging
+# deploy-dev: build
+# 	scp -P ${SSH_PORT} secrets/dev.json ${DEV_HOST}:${DEV_BASE}/${DEPLOY_DIR}/secrets.json
+# 	ssh ${DEV_HOST} -p ${SSH_PORT} "docker service rm erik_${DEPLOY_DIR}"
+# 	ssh ${DEV_HOST} -p ${SSH_PORT} "IMG=${IMAGE} TAG=${RELEASE_VERSION} DIR=${DEV_BASE}/${DEPLOY_DIR} docker stack deploy -c ${DEPLOY_DIR}/docker/run.yml erik --with-registry-auth"
+# 	ssh ${DEV_HOST} -p ${SSH_PORT} "rm -f ${DEPLOY_DIR}/secrets.json"
+# 	@echo "DEPLOYED on STAGING! VERSION is: ${RELEASE_VERSION}"
 
 ## Building and Deploying on Production
-deploy-prd: build-prd
+deploy-prd-unbuild:
 	ssh ${PRD_HOST} -p ${SSH_PORT} "mkdir -p ${DEPLOY_DIR}/docker"
 	scp -P ${SSH_PORT} -r docker/run.yml ${PRD_HOST}:${PRD_BASE}/${DEPLOY_DIR}/docker/
 	scp -P ${SSH_PORT} secrets/prd.json ${PRD_HOST}:${PRD_BASE}/${DEPLOY_DIR}/secrets.json
+	ssh ${DEV_HOST} -p ${SSH_PORT} "docker service rm erik_${DEPLOY_DIR}"
 	ssh ${PRD_HOST} -p ${SSH_PORT} "IMG=${IMAGE} TAG=${RELEASE_VERSION} DIR=${PRD_BASE}/${DEPLOY_DIR} MODE=release docker stack deploy -c ${DEPLOY_DIR}/docker/run.yml erik --with-registry-auth"
 	ssh ${PRD_HOST} -p ${SSH_PORT} "rm -f ${DEPLOY_DIR}/secrets.json"
 	@echo "DEPLOYED on PRODUCTION! VERSION is: ${RELEASE_VERSION}"
+
+deploy-prd: build-prd deploy-prd-unbuild
 
 ## Purge Docker Caches on Build Server
 cleanup:
