@@ -123,7 +123,7 @@ func (h *questionsHandler) Delete() gin.HandlerFunc {
 	}
 }
 
-func (h *questionsHandler) Find() gin.HandlerFunc {
+func (h *questionsHandler) FindQuestion() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
 		// Bind Request
@@ -143,7 +143,7 @@ func (h *questionsHandler) Find() gin.HandlerFunc {
 		}
 
 		// FIND QUESTION
-		final_q, err := h.questionsService.FindByShtem(question)
+		final_q, err := h.questionsService.FindQuestionByNumber(question)
 		if err != nil {
 			log.Printf("questionsHandler:Find (%v)", err.RawError())
 			dto.WriteErrorResponse(ctx, err)
@@ -152,6 +152,39 @@ func (h *questionsHandler) Find() gin.HandlerFunc {
 
 		resp := new(dto.QuestionResponse)
 		resp.FromDomain(final_q)
+		dto.WriteResponse(ctx, resp)
+	}
+}
+
+func (h *questionsHandler) FindBajin() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+		// Bind Request
+		req := new(dto.FindQuestionRequest)
+		if err := ctx.BindJSON(req); err != nil {
+			log.Printf("questionsHandler:Find (%v)", err)
+			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
+			return
+		}
+
+		// Convert to question
+		question := new(domain.Question)
+		if err := req.ToDomain(question); err != nil {
+			log.Printf("questionsHandler:Find (%s)", err.GetMessage())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		// FIND QUESTION
+		final_q, err := h.questionsService.FindBajin(question)
+		if err != nil {
+			log.Printf("questionsHandler:Find (%v)", err.RawError())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		resp := new(dto.BajinResponse)
+		resp.SliceFromDomain(final_q)
 		dto.WriteResponse(ctx, resp)
 	}
 }
