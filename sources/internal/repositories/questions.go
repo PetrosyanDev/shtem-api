@@ -32,6 +32,9 @@ func (p *questionsRepository) FindQuestionByNumber(question *domain.Question) (*
 func (p *questionsRepository) FindByID(id int) (*domain.Question, domain.Error) {
 	return p.db.FindByID(id)
 }
+func (p *questionsRepository) GetShtemNames() ([]string, domain.Error) {
+	return p.db.GetShtemNames()
+}
 
 func NewQuestionsRepository(db postgresrepository.QuestionsDB) *questionsRepository {
 	return &questionsRepository{db}
