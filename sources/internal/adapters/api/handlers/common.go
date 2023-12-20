@@ -8,4 +8,5 @@ type QuestionsHandler interface {
 	Delete() gin.HandlerFunc
 	FindQuestion() gin.HandlerFunc
 	FindBajin() gin.HandlerFunc
+	GetShtems() gin.HandlerFunc
 }

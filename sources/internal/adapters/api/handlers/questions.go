@@ -189,6 +189,23 @@ func (h *questionsHandler) FindBajin() gin.HandlerFunc {
 	}
 }
 
+func (h *questionsHandler) GetShtems() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+		// FIND shtems
+		shtems, err := h.questionsService.GetShtemNames()
+		if err != nil {
+			log.Printf("questionsHandler:GetShtems (%v)", err.RawError())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		resp := new(dto.ShtemsResponce)
+		resp.SliceFromDomain(shtems)
+		dto.WriteResponse(ctx, resp)
+	}
+}
+
 func NewQuestionsHandler(
 	cfg *configs.Configs,
 	questionsService ports.QuestionsService,

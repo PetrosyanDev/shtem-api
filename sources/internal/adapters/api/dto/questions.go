@@ -133,6 +133,10 @@ type BajinResponse struct {
 	Response[[]QuestionResponseData]
 }
 
+type ShtemsResponce struct {
+	Response[[]string]
+}
+
 func (r *QuestionResponse) FromDomain(p *domain.Question) {
 	r.Data = new(QuestionResponseData)
 	r.Data.ID = p.ID
@@ -163,5 +167,17 @@ func (r *BajinResponse) SliceFromDomain(p []*domain.Question) {
 			Options:   q.Options,
 			Answers:   q.Answers,
 		}
+	}
+}
+
+func (r *ShtemsResponce) SliceFromDomain(p []string) {
+	// Initialize r.Data as a pointer to a slice
+	r.Data = new([]string)
+
+	// Initialize the underlying slice
+	*r.Data = make([]string, len(p))
+
+	for index, q := range p {
+		(*r.Data)[index] = q
 	}
 }

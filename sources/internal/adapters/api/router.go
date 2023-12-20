@@ -19,6 +19,7 @@ func NewAPIRouter(cfg *configs.Configs, questionsHandler handlers.QuestionsHandl
 	apiV1 := r.Group("/api/v1")
 	{
 		posts := apiV1.Group("/questions")
+		posts.POST("/getShtems", questionsHandler.GetShtems())
 		posts.POST("/create", questionsHandler.Create())
 		posts.POST("/find", questionsHandler.FindQuestion())
 		posts.POST("/findBajin", questionsHandler.FindBajin())
