@@ -10,4 +10,5 @@ type QuestionsDB interface {
 	FindBajin(question *domain.Question) ([]*domain.Question, domain.Error)
 	FindQuestionByNumber(question *domain.Question) (*domain.Question, domain.Error)
 	FindByID(id int) (*domain.Question, domain.Error)
+	GetShtemNames() ([]string, domain.Error)
 }

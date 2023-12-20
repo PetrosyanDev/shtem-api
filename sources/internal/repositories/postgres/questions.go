@@ -157,6 +157,36 @@ func (q *questionsDB) FindQuestionByNumber(question *domain.Question) (*domain.Q
 	return &result, nil
 }
 
+func (q *questionsDB) GetShtemNames() ([]string, domain.Error) {
+	var shtemaranNames []string
+
+	// FIND DISTINCT SHTEMARAN NAMES
+	query := fmt.Sprintf("SELECT DISTINCT %s FROM %s",
+		questionsTableComponents.shtemaran,
+		questionsTableName, // TABLE NAME
+	)
+
+	rows, err := q.db.Query(q.ctx, query)
+	if err != nil {
+		return nil, domain.NewError().SetError(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var shtemaranName string
+		if err := rows.Scan(&shtemaranName); err != nil {
+			return nil, domain.NewError().SetError(err)
+		}
+		shtemaranNames = append(shtemaranNames, shtemaranName)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, domain.NewError().SetError(err)
+	}
+
+	return shtemaranNames, nil
+}
+
 func (q *questionsDB) FindBajin(question *domain.Question) ([]*domain.Question, domain.Error) {
 
 	// FIND!
