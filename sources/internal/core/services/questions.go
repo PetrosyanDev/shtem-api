@@ -38,6 +38,9 @@ func (q *questionsService) FindBajin(question *domain.Question) ([]*domain.Quest
 func (q *questionsService) FindByID(id int) (*domain.Question, domain.Error) {
 	return q.questionsRepository.FindByID(id)
 }
+func (q *questionsService) GetShtemNames() ([]string, domain.Error) {
+	return q.questionsRepository.GetShtemNames()
+}
 
 func NewQuestionsService(questionsRepository repositories.QuestionsRepository) *questionsService {
 	return &questionsService{questionsRepository}
