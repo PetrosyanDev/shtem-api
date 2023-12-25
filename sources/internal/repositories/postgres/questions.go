@@ -193,7 +193,7 @@ func (q *questionsDB) FindBajin(question *domain.Question) ([]*domain.Question, 
 	query := fmt.Sprintf(`
 			SELECT %s, %s, %s, %s, %s, %s, %s 
 			FROM %s 
-			WHERE %s=$1
+			WHERE %s=$1 AND %s=$2
 			ORDER BY %s, %s`,
 		questionsTableComponents.shtemaran,
 		questionsTableComponents.bajin,
@@ -202,12 +202,16 @@ func (q *questionsDB) FindBajin(question *domain.Question) ([]*domain.Question, 
 		questionsTableComponents.text,
 		questionsTableComponents.options,
 		questionsTableComponents.answers,
-		questionsTableName,                // TABLE NAME
-		questionsTableComponents.bajin,    // WHERE BAJIN =
-		questionsTableComponents.mas,      // Sort by
-		questionsTableComponents.q_number, // Sort by
+		questionsTableName,                 // TABLE NAME
+		questionsTableComponents.shtemaran, // WHERE SHTEM =
+		questionsTableComponents.bajin,     // WHERE BAJIN =
+		questionsTableComponents.mas,       // Sort by
+		questionsTableComponents.q_number,  // Sort by
 	)
-	rows, err := q.db.Query(q.ctx, query, question.Bajin)
+	rows, err := q.db.Query(q.ctx, query,
+		question.ShtemName,
+		question.Bajin,
+	)
 	if err == pgx.ErrNoRows {
 		return nil, domain.ErrNoRows
 	} else if err != nil {
