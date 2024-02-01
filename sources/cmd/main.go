@@ -9,7 +9,7 @@ import (
 
 	"shtem-api/sources/internal/adapters/api"
 	"shtem-api/sources/internal/adapters/api/handlers"
-	postgreclient "shtem-api/sources/internal/clients/postgresql"
+	postgreclient "shtem-api/sources/internal/clients/postgres"
 	"shtem-api/sources/internal/configs"
 	"shtem-api/sources/internal/core/services"
 	"shtem-api/sources/internal/repositories"
@@ -41,17 +41,23 @@ func main() {
 		log.Fatalf("failed to connect with PostgresDB (%v)", err)
 	}
 	questionsDB := postgresrepository.NewQuestionsDB(appCtx, postgresDB)
+	shtemsDB := postgresrepository.NewShtemsDB(appCtx, postgresDB)
+	categoriesDB := postgresrepository.NewCategoriesDB(appCtx, postgresDB)
 
 	log.Println("init repositories")
 	questionsRepository := repositories.NewQuestionsRepository(questionsDB)
+	shtemsRepository := repositories.NewShtemsRepository(shtemsDB)
+	categoriesRepository := repositories.NewCategoriesRepository(categoriesDB)
 
 	log.Println("init services")
 	questionsService := services.NewQuestionsService(questionsRepository)
+	shtemsService := services.NewShtemsService(shtemsRepository)
+	categoriesService := services.NewCategoriesService(categoriesRepository)
 
 	log.Println("init handlers")
-	questionsHandler := handlers.NewQuestionsHandler(cfg, questionsService)
+	apiHandler := handlers.NewAPIHandler(cfg, questionsService, shtemsService, categoriesService)
 
-	apiRouter := api.NewAPIRouter(cfg, questionsHandler)
+	apiRouter := api.NewAPIRouter(cfg, apiHandler)
 	apiApp, err := api.NewAPIServer(apiRouter)
 	if err != nil {
 		log.Fatalf("failed to create API server (%v)", err)

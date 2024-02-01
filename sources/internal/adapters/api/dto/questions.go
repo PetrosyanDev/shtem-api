@@ -2,68 +2,69 @@ package dto
 
 import (
 	"shtem-api/sources/internal/core/domain"
+	"shtem-api/sources/internal/core/ports"
 )
 
 // CREATE
 type CreateQuestionRequest struct {
-	ShtemName string   `json:"shtemaran" binding:"required"`
-	Bajin     int      `json:"bajin" binding:"required"`
-	Mas       int      `json:"mas" binding:"required"`
-	Number    int      `json:"number" binding:"required"`
-	Text      string   `json:"text" binding:"required"`
-	Options   []string `json:"options" binding:"required"`
-	Answers   []int    `json:"answers" binding:"required"`
+	Bajin   int      `json:"bajin" binding:"required"`
+	Mas     int      `json:"mas" binding:"required"`
+	Number  int      `json:"number" binding:"required"`
+	Text    string   `json:"text" binding:"required"`
+	Options []string `json:"options" binding:"required"`
+	Answers []int    `json:"answers" binding:"required"`
+	ShtemId int      `json:"shtemaran" binding:"required"`
 }
 
 type CreateQuestionResponce struct {
-	ID        int      `json:"id"`
-	ShtemName string   `json:"shtemaran"`
-	Bajin     int      `json:"bajin"`
-	Mas       int      `json:"mas"`
-	Number    int      `json:"number"`
-	Text      string   `json:"text"`
-	Options   []string `json:"options"`
-	Answers   []int    `json:"answers"`
+	ID      int64    `json:"id"`
+	Bajin   int      `json:"bajin"`
+	Mas     int      `json:"mas"`
+	Number  int      `json:"number"`
+	Text    string   `json:"text"`
+	Options []string `json:"options"`
+	Answers []int    `json:"answers"`
+	ShtemId int64    `json:"shtemaran"`
 }
 
 func (r *CreateQuestionRequest) ToDomain(p *domain.Question) domain.Error {
-	p.ShtemName = r.ShtemName
 	p.Bajin = r.Bajin
 	p.Mas = r.Mas
-	p.Number = r.Number
+	p.Q_number = r.Number
 	p.Text = r.Text
 	p.Options = r.Options
 	p.Answers = r.Answers
+	p.ShtemId = int64(r.ShtemId)
 	return nil
 }
 
 // UPDATE
 type UpdateQuestionRequest struct {
-	ShtemName string   `json:"shtemaran"`
-	Bajin     int      `json:"bajin"`
-	Mas       int      `json:"mas"`
-	Number    int      `json:"number"`
-	Text      string   `json:"text"`
-	Options   []string `json:"options"`
-	Answers   []int    `json:"answers"`
+	Bajin   int      `json:"bajin"`
+	Mas     int      `json:"mas"`
+	Number  int      `json:"number"`
+	Text    string   `json:"text"`
+	Options []string `json:"options"`
+	Answers []int    `json:"answers"`
+	ShtemId int64    `json:"shtemaran"`
 }
 
 type UpdateQuestionResponce struct {
-	ID        int      `json:"id"`
-	ShtemName string   `json:"shtemaran"`
-	Bajin     int      `json:"bajin"`
-	Mas       int      `json:"mas"`
-	Number    int      `json:"number"`
-	Text      string   `json:"text"`
-	Options   []string `json:"options"`
-	Answers   []int    `json:"answers"`
+	ID      int      `json:"id"`
+	Bajin   int      `json:"bajin"`
+	Mas     int      `json:"mas"`
+	Number  int      `json:"number"`
+	Text    string   `json:"text"`
+	Options []string `json:"options"`
+	Answers []int    `json:"answers"`
+	ShtemId int64    `json:"shtemaran"`
 }
 
 func (r *UpdateQuestionRequest) ToDomain(p *domain.Question) domain.Error {
-	p.ShtemName = r.ShtemName
+	p.ShtemId = r.ShtemId
 	p.Bajin = r.Bajin
 	p.Mas = r.Mas
-	p.Number = r.Number
+	p.Q_number = r.Number
 	p.Text = r.Text
 	p.Options = r.Options
 	p.Answers = r.Answers
@@ -72,57 +73,63 @@ func (r *UpdateQuestionRequest) ToDomain(p *domain.Question) domain.Error {
 
 // DELETE
 type DeleteQuestionRequest struct {
-	ID        int    `json:"id" binding:"required"`
-	ShtemName string `json:"shtemaran" binding:"required"`
+	ID int64 `json:"id" binding:"required"`
 }
 
 type DeleteQuestionResponce struct {
-	ID        int    `json:"id"`
-	ShtemName string `json:"shtemaran"`
+	ID int64 `json:"id"`
 }
 
 func (r *DeleteQuestionRequest) ToDomain(p *domain.Question) domain.Error {
-	p.ID = r.ID
-	p.ShtemName = r.ShtemName
+	p.Q_id = r.ID
 	return nil
 }
 
 // FIND
 type FindQuestionRequest struct {
-	ShtemName string `json:"shtemaran" binding:"required"`
-	Bajin     int    `json:"bajin" binding:"required"`
-	Mas       int    `json:"mas" binding:"required"`
-	Number    int    `json:"number" binding:"required"`
+	Bajin         int    `json:"bajin" binding:"required"`
+	Mas           int    `json:"mas" binding:"required"`
+	Number        int    `json:"number" binding:"required"`
+	ShtemLinkName string `json:"shtemaran" binding:"required"`
 }
 
 type FindQuestionResponce struct {
-	ShtemName string   `json:"shtemaran"`
-	Bajin     int      `json:"bajin"`
-	Mas       int      `json:"mas"`
-	Number    int      `json:"number"`
-	Text      string   `json:"text"`
-	Options   []string `json:"options"`
-	Answers   []int    `json:"answers"`
+	Bajin   int      `json:"bajin"`
+	Mas     int      `json:"mas"`
+	Number  int      `json:"number"`
+	Text    string   `json:"text"`
+	Options []string `json:"options"`
+	Answers []int    `json:"answers"`
+	ShtemId int64    `json:"shtemaran"`
 }
 
-func (r *FindQuestionRequest) ToDomain(p *domain.Question) domain.Error {
-	p.ShtemName = r.ShtemName
+func (r *FindQuestionRequest) ToDomain(p *domain.Question, s ports.ShtemsService) domain.Error {
+
+	shtem, err := s.GetShtemByLinkName(r.ShtemLinkName)
+	if err != nil {
+		return domain.ErrBadRequest
+	}
+
 	p.Bajin = r.Bajin
 	p.Mas = r.Mas
-	p.Number = r.Number
+	p.Q_number = r.Number
+	p.ShtemId = shtem.Id
+
 	return nil
 }
 
-// Globals
+// GLOBAL
+// GLOBAL
+// GLOBAL
 type QuestionResponseData struct {
-	ID        int      `json:"id,omitempty"`
-	ShtemName string   `json:"shtemaran,omitempty"`
-	Bajin     int      `json:"bajin,omitempty"`
-	Mas       int      `json:"mas,omitempty"`
-	Number    int      `json:"number,omitempty"`
-	Text      string   `json:"text,omitempty"`
-	Options   []string `json:"options,omitempty"`
-	Answers   []int    `json:"answers,omitempty"`
+	ID      int64    `json:"id,omitempty"`
+	Bajin   int      `json:"bajin,omitempty"`
+	Mas     int      `json:"mas,omitempty"`
+	Number  int      `json:"number,omitempty"`
+	Text    string   `json:"text,omitempty"`
+	Options []string `json:"options,omitempty"`
+	Answers []int    `json:"answers,omitempty"`
+	ShtemId int64    `json:"shtemaran,omitempty"`
 }
 
 type QuestionResponse struct {
@@ -139,14 +146,14 @@ type ShtemsResponce struct {
 
 func (r *QuestionResponse) FromDomain(p *domain.Question) {
 	r.Data = new(QuestionResponseData)
-	r.Data.ID = p.ID
-	r.Data.ShtemName = p.ShtemName
+	r.Data.ID = p.Q_id
 	r.Data.Bajin = p.Bajin
 	r.Data.Mas = p.Mas
-	r.Data.Number = p.Number
+	r.Data.Number = p.Q_number
 	r.Data.Text = p.Text
 	r.Data.Options = p.Options
 	r.Data.Answers = p.Answers
+	r.Data.ShtemId = p.ShtemId
 }
 
 func (r *BajinResponse) SliceFromDomain(p []*domain.Question) {
@@ -158,14 +165,14 @@ func (r *BajinResponse) SliceFromDomain(p []*domain.Question) {
 
 	for index, q := range p {
 		(*r.Data)[index] = QuestionResponseData{
-			ID:        q.ID,
-			ShtemName: q.ShtemName,
-			Bajin:     q.Bajin,
-			Mas:       q.Mas,
-			Number:    q.Number,
-			Text:      q.Text,
-			Options:   q.Options,
-			Answers:   q.Answers,
+			ID:      q.Q_id,
+			Bajin:   q.Bajin,
+			Mas:     q.Mas,
+			Number:  q.Q_number,
+			Text:    q.Text,
+			Options: q.Options,
+			Answers: q.Answers,
+			ShtemId: q.Q_id,
 		}
 	}
 }
