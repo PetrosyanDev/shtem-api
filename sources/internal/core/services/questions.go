@@ -19,27 +19,21 @@ func (q *questionsService) Update(question *domain.Question) domain.Error {
 	return err
 }
 
-func (q *questionsService) Delete(id int) domain.Error {
+func (q *questionsService) Delete(id int64) domain.Error {
 	err := q.questionsRepository.Delete(id)
 	return err
 }
 
-/*
-Convert shtemName, Bajin, Mas, Number to full domain.Question Struct
-*/
-func (q *questionsService) FindQuestionByNumber(question *domain.Question) (*domain.Question, domain.Error) {
-	return q.questionsRepository.FindQuestionByNumber(question)
+func (q *questionsService) FindQuestion(question *domain.Question) (*domain.Question, domain.Error) {
+	return q.questionsRepository.FindQuestion(question)
 }
 
 func (q *questionsService) FindBajin(question *domain.Question) ([]*domain.Question, domain.Error) {
 	return q.questionsRepository.FindBajin(question)
 }
 
-func (q *questionsService) FindByID(id int) (*domain.Question, domain.Error) {
+func (q *questionsService) FindByID(id int64) (*domain.Question, domain.Error) {
 	return q.questionsRepository.FindByID(id)
-}
-func (q *questionsService) GetShtemNames() ([]string, domain.Error) {
-	return q.questionsRepository.GetShtemNames()
 }
 
 func NewQuestionsService(questionsRepository repositories.QuestionsRepository) *questionsService {
