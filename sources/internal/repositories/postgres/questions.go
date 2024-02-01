@@ -4,33 +4,46 @@ package postgresrepository
 import (
 	"context"
 	"fmt"
-	postgreclient "shtem-api/sources/internal/clients/postgresql"
+	"log"
+	postgreclient "shtem-api/sources/internal/clients/postgres"
 	"shtem-api/sources/internal/core/domain"
 
 	"github.com/jackc/pgx/v5"
 )
 
-var questionsTableComponents = struct {
-	q_id      string
-	shtemaran string
-	bajin     string
-	mas       string
-	q_number  string
-	text      string
-	options   string
-	answers   string
-}{
-	q_id:      "q_id",
-	shtemaran: "shtemaran",
-	bajin:     "bajin",
-	mas:       "mas",
-	q_number:  "q_number",
-	text:      "text",
-	options:   "options",
-	answers:   "answers",
+var questionsTableName = "questions"
+
+type questionTable struct {
+	q_id     string
+	bajin    string
+	mas      string
+	q_number string
+	text     string
+	options  string
+	answers  string
+	shtem_id string
 }
 
-var questionsTableName = "questions"
+var questionsTableComponents = questionTable{
+	q_id:     questionsTableName + ".q_id",
+	bajin:    questionsTableName + ".bajin",
+	mas:      questionsTableName + ".mas",
+	q_number: questionsTableName + ".q_number",
+	text:     questionsTableName + ".text",
+	options:  questionsTableName + ".options",
+	answers:  questionsTableName + ".answers",
+	shtem_id: questionsTableName + ".shtem_id",
+}
+var questionsTableComponentsNon = questionTable{
+	q_id:     "q_id",
+	bajin:    "bajin",
+	mas:      "mas",
+	q_number: "q_number",
+	text:     "text",
+	options:  "options",
+	answers:  "answers",
+	shtem_id: "shtem_id",
+}
 
 type questionsDB struct {
 	ctx context.Context
@@ -42,25 +55,32 @@ type questionsDB struct {
 // CREATE!
 func (q *questionsDB) Create(question *domain.Question) domain.Error {
 
-	query := fmt.Sprintf("INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s) VALUES ($1, $2, $3, $4, $5, $6, $7)", questionsTableName,
-		questionsTableComponents.shtemaran,
-		questionsTableComponents.bajin,
-		questionsTableComponents.mas,
-		questionsTableComponents.q_number,
-		questionsTableComponents.text,
-		questionsTableComponents.options,
-		questionsTableComponents.answers,
+	query := fmt.Sprintf(`
+		INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
+		RETURNING %s`,
+		questionsTableName, // TABLE NAME
+		questionsTableComponentsNon.bajin,
+		questionsTableComponentsNon.mas,
+		questionsTableComponentsNon.q_number,
+		questionsTableComponentsNon.text,
+		questionsTableComponentsNon.options,
+		questionsTableComponentsNon.answers,
+		questionsTableComponentsNon.shtem_id,
+		questionsTableComponentsNon.q_id,
 	)
-	_, err := q.db.Exec(q.ctx, query,
-		question.ShtemName,
+
+	err := q.db.QueryRow(q.ctx, query,
 		question.Bajin,
 		question.Mas,
-		question.Number,
+		question.Q_number,
 		question.Text,
 		question.Options,
 		question.Answers,
-	)
+		question.ShtemId,
+	).Scan(&question.Q_id)
 	if err != nil {
+		log.Println(err)
 		return domain.NewError().SetError(err)
 	}
 
@@ -72,25 +92,29 @@ func (q *questionsDB) Create(question *domain.Question) domain.Error {
 // UPDATE!
 func (q *questionsDB) Update(question *domain.Question) domain.Error {
 
-	query := fmt.Sprintf("UPDATE %s SET %s=$1, %s=$2, %s=$3, %s=$4, %s=$5, %s=$6, %s=$7 WHERE %s=$8", questionsTableName,
-		questionsTableComponents.shtemaran,
-		questionsTableComponents.bajin,
-		questionsTableComponents.mas,
-		questionsTableComponents.q_number,
-		questionsTableComponents.text,
-		questionsTableComponents.options,
-		questionsTableComponents.answers,
+	query := fmt.Sprintf(`
+		UPDATE %s 
+		SET %s=$1, %s=$2, %s=$3, %s=$4, %s=$5, %s=$6, %s=$7 
+		WHERE %s=$8`,
+		questionsTableName, // TABLE NAME
+		questionsTableComponentsNon.bajin,
+		questionsTableComponentsNon.mas,
+		questionsTableComponentsNon.q_number,
+		questionsTableComponentsNon.text,
+		questionsTableComponentsNon.options,
+		questionsTableComponentsNon.answers,
+		questionsTableComponentsNon.shtem_id,
 		questionsTableComponents.q_id, // for identifying the question to update
 	)
 	_, err := q.db.Exec(q.ctx, query,
-		question.ShtemName,
 		question.Bajin,
 		question.Mas,
-		question.Number,
+		question.Q_number,
 		question.Text,
 		question.Options,
 		question.Answers,
-		question.ID, // for identifying the question to update
+		question.ShtemId,
+		question.Q_id, // for identifying the question to update
 	)
 	if err != nil {
 		return domain.NewError().SetError(err)
@@ -101,9 +125,12 @@ func (q *questionsDB) Update(question *domain.Question) domain.Error {
 // DELETE!
 // DELETE!
 // DELETE!
-func (q *questionsDB) Delete(id int) domain.Error {
+func (q *questionsDB) Delete(id int64) domain.Error {
 	// DELETE!
-	query := fmt.Sprintf("DELETE FROM %s WHERE %s=$1", questionsTableName,
+	query := fmt.Sprintf(`
+		DELETE FROM %s 
+		WHERE %s=$1`,
+		questionsTableName,
 		questionsTableComponents.q_id,
 	)
 	_, err := q.db.Exec(q.ctx, query,
@@ -116,37 +143,49 @@ func (q *questionsDB) Delete(id int) domain.Error {
 	return nil
 }
 
-// FINDBYSHTEM
-// FINDBYSHTEM
-// FINDBYSHTEM
-func (q *questionsDB) FindQuestionByNumber(question *domain.Question) (*domain.Question, domain.Error) {
+// FINDQUESTION
+// FINDQUESTION
+// FINDQUESTION
+func (q *questionsDB) FindQuestion(question *domain.Question) (*domain.Question, domain.Error) {
 
 	var result domain.Question
 
 	// FIND!
-	query := fmt.Sprintf("SELECT %s, %s, %s, %s, %s, %s, %s FROM %s WHERE %s=$1 AND %s=$2 AND %s=$3 AND %s=$4",
-		questionsTableComponents.shtemaran,
+	query := fmt.Sprintf(`
+		SELECT %s, %s, %s, %s, %s, %s, %s 
+		FROM %s 
+		WHERE %s=$1 AND %s=$2 AND %s=$3 AND %s=$4`,
+		// SELECT
 		questionsTableComponents.bajin,
 		questionsTableComponents.mas,
 		questionsTableComponents.q_number,
 		questionsTableComponents.text,
 		questionsTableComponents.options,
 		questionsTableComponents.answers,
-		questionsTableName,                 // TABLE NAME
-		questionsTableComponents.shtemaran, // WHERE BAJIN =
-		questionsTableComponents.bajin,     // WHERE BAJIN =
-		questionsTableComponents.mas,       // WHERE MAS =
-		questionsTableComponents.q_number,  // WHERE Q_NUMBER =
+		questionsTableComponents.shtem_id,
+		// FROM
+		questionsTableName,
+		// WHERE
+		questionsTableComponents.shtem_id, // shtems
+		questionsTableComponents.bajin,    // bajin
+		questionsTableComponents.mas,      // mas
+		questionsTableComponents.q_number, // q_number
 	)
-	err := q.db.QueryRow(q.ctx, query, question.ShtemName, question.Bajin, question.Mas, question.Number).
+	err := q.db.QueryRow(q.ctx, query,
+		// WHERE
+		question.ShtemId,
+		question.Bajin,
+		question.Mas,
+		question.Q_number).
 		Scan(
-			&result.ShtemName,
+			// SELECTED
 			&result.Bajin,
 			&result.Mas,
-			&result.Number,
+			&result.Q_number,
 			&result.Text,
 			&result.Options,
 			&result.Answers,
+			&result.ShtemId,
 		)
 	if err == pgx.ErrNoRows {
 		return nil, domain.ErrNoRows
@@ -157,59 +196,43 @@ func (q *questionsDB) FindQuestionByNumber(question *domain.Question) (*domain.Q
 	return &result, nil
 }
 
-func (q *questionsDB) GetShtemNames() ([]string, domain.Error) {
-	var shtemaranNames []string
-
-	// FIND DISTINCT SHTEMARAN NAMES
-	query := fmt.Sprintf("SELECT DISTINCT %s FROM %s",
-		questionsTableComponents.shtemaran,
-		questionsTableName, // TABLE NAME
-	)
-
-	rows, err := q.db.Query(q.ctx, query)
-	if err != nil {
-		return nil, domain.NewError().SetError(err)
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var shtemaranName string
-		if err := rows.Scan(&shtemaranName); err != nil {
-			return nil, domain.NewError().SetError(err)
-		}
-		shtemaranNames = append(shtemaranNames, shtemaranName)
-	}
-
-	if err := rows.Err(); err != nil {
-		return nil, domain.NewError().SetError(err)
-	}
-
-	return shtemaranNames, nil
-}
-
+// FINDBAJIN
+// FINDBAJIN
+// FINDBAJIN
 func (q *questionsDB) FindBajin(question *domain.Question) ([]*domain.Question, domain.Error) {
 
 	// FIND!
 	query := fmt.Sprintf(`
-			SELECT %s, %s, %s, %s, %s, %s, %s 
-			FROM %s 
-			WHERE %s=$1 AND %s=$2
-			ORDER BY %s, %s`,
-		questionsTableComponents.shtemaran,
+		SELECT %s, %s, %s, %s, %s, %s, %s 
+		FROM %s 
+		JOIN %s
+		ON %s=%s
+		WHERE %s=$1 AND %s=$2
+		ORDER BY %s, %s`,
+		// SELECT
 		questionsTableComponents.bajin,
 		questionsTableComponents.mas,
 		questionsTableComponents.q_number,
 		questionsTableComponents.text,
 		questionsTableComponents.options,
 		questionsTableComponents.answers,
-		questionsTableName,                 // TABLE NAME
-		questionsTableComponents.shtemaran, // WHERE SHTEM =
-		questionsTableComponents.bajin,     // WHERE BAJIN =
-		questionsTableComponents.mas,       // Sort by
-		questionsTableComponents.q_number,  // Sort by
+		questionsTableComponents.shtem_id,
+		// FROM
+		questionsTableName,
+		// JOIN
+		shtemsTableName,
+		// ON
+		shtemsTableComponents.id,
+		questionsTableComponents.shtem_id,
+		// WHERE
+		questionsTableComponents.shtem_id,
+		questionsTableComponents.bajin,
+		// ORDER BY
+		questionsTableComponents.mas,
+		questionsTableComponents.q_number,
 	)
 	rows, err := q.db.Query(q.ctx, query,
-		question.ShtemName,
+		question.ShtemId,
 		question.Bajin,
 	)
 	if err == pgx.ErrNoRows {
@@ -225,13 +248,13 @@ func (q *questionsDB) FindBajin(question *domain.Question) ([]*domain.Question, 
 		var result domain.Question
 		// Scan the row data into the result struct
 		if err := rows.Scan(
-			&result.ShtemName,
 			&result.Bajin,
 			&result.Mas,
-			&result.Number,
+			&result.Q_number,
 			&result.Text,
 			&result.Options,
 			&result.Answers,
+			&result.ShtemId,
 		); err != nil {
 			return nil, domain.ErrBadRequest
 		}
@@ -245,32 +268,38 @@ func (q *questionsDB) FindBajin(question *domain.Question) ([]*domain.Question, 
 // FINDBYID!
 // FINDBYID!
 // FINDBYID!
-func (q *questionsDB) FindByID(id int) (*domain.Question, domain.Error) {
+func (q *questionsDB) FindByID(id int64) (*domain.Question, domain.Error) {
 
 	var result domain.Question
 
-	query := fmt.Sprintf("SELECT %s, %s, %s, %s, %s, %s, %s, %s FROM %s WHERE %s=$1",
+	query := fmt.Sprintf(`
+		SELECT %s, %s, %s, %s, %s, %s, %s, %s 
+		FROM %s 
+		WHERE %s=$1`,
+		// SELECT
 		questionsTableComponents.q_id,
-		questionsTableComponents.shtemaran,
 		questionsTableComponents.bajin,
 		questionsTableComponents.mas,
 		questionsTableComponents.q_number,
 		questionsTableComponents.text,
 		questionsTableComponents.options,
 		questionsTableComponents.answers,
-		questionsTableName,            // SHTEM NAME
-		questionsTableComponents.q_id, // Identifyer
+		questionsTableComponents.shtem_id,
+		// FROM
+		questionsTableName,
+		// WHERE
+		questionsTableComponents.q_id,
 	)
 	err := q.db.QueryRow(q.ctx, query, id).
 		Scan(
-			&result.ID,
-			&result.ShtemName,
+			&result.Q_id,
 			&result.Bajin,
 			&result.Mas,
-			&result.Number,
+			&result.Q_number,
 			&result.Text,
 			&result.Options,
 			&result.Answers,
+			&result.ShtemId,
 		)
 	if err == pgx.ErrNoRows {
 		return nil, domain.ErrNoRows
