@@ -26,6 +26,12 @@ type CategoriesRepository interface {
 	GetShtemsByCategoryLinkName(c_linkName string) ([]*domain.Shtemaran, domain.Error)
 }
 
+type AdminRepository interface {
+	Create(username, password, token string) (*domain.Admin, domain.Error)
+	Update(adm *domain.Admin) domain.Error
+	Delete(id int64) domain.Error
+}
+
 type AdminTokenRepository interface {
 	GenerateToken() (*domain.AdminToken, domain.Error)
 	GetToken(token string) (*domain.AdminToken, domain.Error)
