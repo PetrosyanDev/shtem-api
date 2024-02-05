@@ -45,5 +45,5 @@ func ApplyCommonMiddlewares(r *gin.Engine, cfg *configs.Configs) {
 	}))
 	r.Use(gzip.Gzip(gzip.DefaultCompression, gzip.WithExcludedExtensions(nonCompressables)))
 	r.Use(connLimit.MaxAllowed(maxConcurrentCon))
-	r.Use(apiKeyValidator(cfg.Global.PublicAPIKey))
+	// r.Use(apiKeyValidator(cfg.Global.PublicAPIKey))
 }
