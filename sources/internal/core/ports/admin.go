@@ -11,6 +11,10 @@ type AdminHandler interface {
 	ValidateToken() gin.HandlerFunc
 
 	Check() gin.HandlerFunc
+
+	Create() gin.HandlerFunc
+	Update() gin.HandlerFunc
+	Delete() gin.HandlerFunc
 }
 
 type AdminService interface {

@@ -29,12 +29,18 @@ func NewAPIRouter(cfg *configs.Configs, apiHandler ports.APIHandler, adminHandle
 		posts.POST("/find", apiHandler.FindQuestion())
 		posts.POST("/findBajin", apiHandler.FindBajin())
 	}
-	{
-		// AUTH
-		admin := apiV1.Group("/admin").Use(adminHandler.ValidateToken())
 
+	// ADMIN
+	admin := apiV1.Group("/admin").Use(adminHandler.ValidateToken())
+	{
 		admin.GET("/check", adminHandler.Check())
+
+		admin.POST("/create", adminHandler.Create())
+		admin.POST("/:id/update", adminHandler.Update())
+		admin.POST("/:id/delete", adminHandler.Delete())
 	}
+
+	// OTHER
 	apiV1.GET("/create", adminHandler.GenerateToken())
 
 	r.NoRoute(func(ctx *gin.Context) { dto.WriteErrorResponse(ctx, domain.ErrRequestPath) })

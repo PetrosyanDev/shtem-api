@@ -49,19 +49,16 @@ func (a *adminDB) Create(username, password string) (*domain.Admin, domain.Error
 	adm.Password = password
 
 	query := fmt.Sprintf(`
-		INSERT INTO %s (%s,%s) 
-		VALUES ($1, $2)`,
-		// INSERT
+	INSERT INTO %s (%s, %s) 
+	VALUES ($1, $2)
+	RETURNING %s`,
 		adminTableName,
-		// ()
 		adminTableComponentsNon.username,
 		adminTableComponentsNon.password,
+		adminTableComponentsNon.id,
 	)
 
-	_, err := a.db.Exec(a.ctx, query,
-		adm.Username,
-		adm.Password,
-	)
+	err := a.db.QueryRow(a.ctx, query, adm.Username, adm.Password).Scan(&adm.ID)
 	if err != nil {
 		log.Println(err)
 		return nil, domain.NewError().SetError(err)

@@ -24,5 +24,5 @@ type Admin struct {
 	AdminBase
 	Username string
 	Password string
-	// Token    AdminToken
+	Token    AdminToken
 }
