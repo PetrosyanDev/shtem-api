@@ -25,3 +25,9 @@ type CategoriesRepository interface {
 	GetCategoriesWithShtems() (domain.Categories, domain.Error)
 	GetShtemsByCategoryLinkName(c_linkName string) ([]*domain.Shtemaran, domain.Error)
 }
+
+type AdminTokenRepository interface {
+	GenerateToken() (*domain.AdminToken, domain.Error)
+	GetToken(token string) (*domain.AdminToken, domain.Error)
+	UpdateToken(t *domain.AdminToken) (*domain.AdminToken, domain.Error)
+}
