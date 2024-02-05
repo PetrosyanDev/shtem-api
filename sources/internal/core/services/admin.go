@@ -9,8 +9,8 @@ type adminService struct {
 	adminRepository repositories.AdminRepository
 }
 
-func (q *adminService) Create(username, password, token string) (*domain.Admin, domain.Error) {
-	return q.adminRepository.Create(username, password, token)
+func (q *adminService) Create(username, password string) (*domain.Admin, domain.Error) {
+	return q.adminRepository.Create(username, password)
 }
 
 func (q *adminService) Update(adm *domain.Admin) domain.Error {

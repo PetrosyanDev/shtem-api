@@ -9,8 +9,8 @@ type adminTokenService struct {
 	adminTokenRepository repositories.AdminTokenRepository
 }
 
-func (q *adminTokenService) GenerateToken() (*domain.AdminToken, domain.Error) {
-	return q.adminTokenRepository.GenerateToken()
+func (q *adminTokenService) GenerateToken(id int64) (*domain.AdminToken, domain.Error) {
+	return q.adminTokenRepository.GenerateToken(id)
 }
 func (q *adminTokenService) GetToken(token string) (*domain.AdminToken, domain.Error) {
 	return q.adminTokenRepository.GetToken(token)

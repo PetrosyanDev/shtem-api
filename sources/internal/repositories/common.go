@@ -27,13 +27,13 @@ type CategoriesRepository interface {
 }
 
 type AdminRepository interface {
-	Create(username, password, token string) (*domain.Admin, domain.Error)
+	Create(username, password string) (*domain.Admin, domain.Error)
 	Update(adm *domain.Admin) domain.Error
 	Delete(id int64) domain.Error
 }
 
 type AdminTokenRepository interface {
-	GenerateToken() (*domain.AdminToken, domain.Error)
+	GenerateToken(id int64) (*domain.AdminToken, domain.Error)
 	GetToken(token string) (*domain.AdminToken, domain.Error)
 	UpdateToken(t *domain.AdminToken) (*domain.AdminToken, domain.Error)
 }

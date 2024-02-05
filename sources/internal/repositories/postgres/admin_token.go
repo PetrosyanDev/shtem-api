@@ -48,28 +48,31 @@ type adminTokenDB struct {
 	db  *postgresclient.PostgresDB
 }
 
-func (a *adminTokenDB) GenerateToken() (*domain.AdminToken, domain.Error) {
+func (a *adminTokenDB) GenerateToken(id int64) (*domain.AdminToken, domain.Error) {
 
 	t := domain.AdminToken{}
+	t.AdminId = id
 	t.Token = uuid.NewString()
 	t.CreatedAt = time.Now()
 	t.Expiry = time.Now().Add(1 * time.Hour)
 
 	query := fmt.Sprintf(`
-		INSERT INTO %s (%s,%s,%s) 
-		VALUES ($1, $2, $3)`,
+		INSERT INTO %s (%s,%s,%s, %s) 
+		VALUES ($1, $2, $3, $4)`,
 		// INSERT
 		adminTokenTableName,
 		// ()
 		adminTokenTableComponentsNon.token,
 		adminTokenTableComponentsNon.createdAt,
 		adminTokenTableComponentsNon.expiry,
+		adminTokenTableComponentsNon.admin_id,
 	)
 
 	_, err := a.db.Exec(a.ctx, query,
 		t.Token,
 		t.CreatedAt,
 		t.Expiry,
+		t.AdminId,
 	)
 	if err != nil {
 		log.Println(err)

@@ -42,7 +42,7 @@ type adminDB struct {
 // CREATE
 // CREATE
 // CREATE
-func (a *adminDB) Create(username, password, token string) (*domain.Admin, domain.Error) {
+func (a *adminDB) Create(username, password string) (*domain.Admin, domain.Error) {
 
 	adm := domain.Admin{}
 	adm.Username = username

@@ -22,7 +22,14 @@ const cookieMaxAge = 1 * 60 * 60 // 1 hour
 func (h *adminHandler) GenerateToken() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
-		t, err := h.adminTokenService.GenerateToken()
+		// u, err := h.adminService.Create("Erik", "pass")
+		// if err != nil {
+		// 	log.Printf("adminHandler:generateToken (%s)", err.GetMessage())
+		// 	dto.WriteErrorResponse(ctx, err)
+		// 	return
+		// }
+
+		t, err := h.adminTokenService.GenerateToken(1)
 		if err != nil {
 			log.Printf("adminHandler:generateToken (%s)", err.GetMessage())
 			dto.WriteErrorResponse(ctx, err)

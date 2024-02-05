@@ -9,8 +9,8 @@ type adminTokenRepository struct {
 	db postgresrepository.AdminTokenDB
 }
 
-func (p *adminTokenRepository) GenerateToken() (*domain.AdminToken, domain.Error) {
-	return p.db.GenerateToken()
+func (p *adminTokenRepository) GenerateToken(id int64) (*domain.AdminToken, domain.Error) {
+	return p.db.GenerateToken(id)
 }
 func (p *adminTokenRepository) GetToken(token string) (*domain.AdminToken, domain.Error) {
 	return p.db.GetToken(token)
