@@ -108,6 +108,44 @@ func (h *adminHandler) Create() gin.HandlerFunc {
 
 func (h *adminHandler) Update() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		// Bind Request
+		req := new(dto.AdminUpdateRequest)
+		if err := ctx.BindJSON(&req); err != nil {
+			log.Printf("adminHandler:Create (%v)", err)
+			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
+			return
+		}
+
+		// Convert to question
+		adm := new(domain.Admin)
+		if err := req.ToDomain(adm); err != nil {
+			log.Printf("adminHandler:Create1 (%s)", err.GetMessage())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		// Find User
+		admin, err := h.adminService.GetByUsername(adm.Username)
+		if err != nil {
+			log.Printf("adminHandler:Create2 (%s)", err.GetMessage())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		admin.Password = adm.Password
+
+		// Update User
+		err = h.adminService.Update(admin)
+		if err != nil {
+			log.Printf("adminHandler:Create4 (%s)", err.GetMessage())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		// Responce
+		resp := new(dto.AdminResponse)
+		resp.FromDomain(admin)
+		dto.WriteResponse(ctx, resp, http.StatusCreated)
 	}
 }
 func (h *adminHandler) Delete() gin.HandlerFunc {

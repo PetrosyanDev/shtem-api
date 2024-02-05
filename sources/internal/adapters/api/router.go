@@ -36,7 +36,7 @@ func NewAPIRouter(cfg *configs.Configs, apiHandler ports.APIHandler, adminHandle
 		admin.GET("/check", adminHandler.Check())
 
 		admin.POST("/create", adminHandler.Create())
-		admin.POST("/:id/update", adminHandler.Update())
+		admin.POST("/update", adminHandler.Update())
 		admin.POST("/:id/delete", adminHandler.Delete())
 	}
 
