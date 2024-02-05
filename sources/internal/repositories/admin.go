@@ -25,6 +25,14 @@ func (p *adminRepository) Delete(id int64) domain.Error {
 	return p.db.Delete(id)
 }
 
+func (p *adminRepository) GetByUsername(username string) (*domain.Admin, domain.Error) {
+	return p.db.GetByUsername(username)
+}
+
+func (p *adminRepository) GetAdmins() (*[]*domain.Admin, domain.Error) {
+	return p.db.GetAdmins()
+}
+
 func NewAdminRepository(db postgresrepository.AdminDB) *adminRepository {
 	return &adminRepository{db}
 }

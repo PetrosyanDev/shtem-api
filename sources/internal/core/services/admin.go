@@ -24,6 +24,12 @@ func (q *adminService) Update(adm *domain.Admin) domain.Error {
 func (q *adminService) Delete(id int64) domain.Error {
 	return q.adminRepository.Delete(id)
 }
+func (q *adminService) GetByUsername(username string) (*domain.Admin, domain.Error) {
+	return q.adminRepository.GetByUsername(username)
+}
+func (q *adminService) GetAdmins() (*[]*domain.Admin, domain.Error) {
+	return q.adminRepository.GetAdmins()
+}
 
 func NewAdminService(adminRepository repositories.AdminRepository) *adminService {
 	return &adminService{adminRepository}

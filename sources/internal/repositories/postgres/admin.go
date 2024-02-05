@@ -162,6 +162,86 @@ func (q *adminDB) Delete(id int64) domain.Error {
 	return nil
 }
 
+// OTHER
+// OTHER
+// OTHER
+func (a *adminDB) GetByUsername(username string) (*domain.Admin, domain.Error) {
+
+	query := fmt.Sprintf(`
+		SELECT %s, %s, %s
+		FROM %s
+		WHERE %s=$1
+		`,
+		// SELECT
+		adminTableComponents.id,
+		adminTableComponents.username,
+		adminTableComponents.password,
+		// FROM
+		adminTableName,
+		// WHERE
+		adminTableComponents.username,
+	)
+
+	adm := domain.Admin{}
+
+	err := a.db.QueryRow(a.ctx, query,
+		username,
+	).Scan(
+		&adm.ID,
+		&adm.Username,
+		&adm.Password,
+	)
+	if err != nil {
+		log.Println(err)
+		return nil, domain.NewError().SetError(err)
+	}
+
+	return &adm, nil
+}
+
+func (a *adminDB) GetAdmins() (*[]*domain.Admin, domain.Error) {
+
+	var users = []*domain.Admin{}
+
+	query := fmt.Sprintf(`
+		SELECT %s, %s, %s, %s, %s
+		FROM %s`,
+		// SELECT
+		adminTableComponents.id,
+		adminTableComponents.createdAt,
+		adminTableComponents.updatedAt,
+		adminTableComponents.username,
+		adminTableComponents.password,
+		// FROM
+		adminTableName,
+	)
+
+	rows, err := a.db.Query(a.ctx, query)
+	if err != nil {
+		log.Println(err)
+		return nil, domain.NewError().SetError(err)
+	}
+
+	for rows.Next() {
+
+		adm := domain.Admin{}
+
+		if err := rows.Scan(
+			adm.ID,
+			adm.CreatedAt,
+			adm.UpdatedAt,
+			adm.Username,
+			adm.Password,
+		); err != nil {
+			return nil, domain.NewError().SetError(err)
+		}
+
+		users = append(users, &adm)
+	}
+
+	return &users, nil
+}
+
 func NewAdminDB(ctx context.Context, db *postgresclient.PostgresDB) *adminDB {
 	return &adminDB{ctx, db}
 }
