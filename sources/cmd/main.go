@@ -44,22 +44,25 @@ func main() {
 	shtemsDB := postgresrepository.NewShtemsDB(appCtx, postgresDB)
 	categoriesDB := postgresrepository.NewCategoriesDB(appCtx, postgresDB)
 	adminTokenDB := postgresrepository.NewAdminTokenDB(appCtx, postgresDB)
+	adminDB := postgresrepository.NewAdminDB(appCtx, postgresDB)
 
 	log.Println("init repositories")
 	questionsRepository := repositories.NewQuestionsRepository(questionsDB)
 	shtemsRepository := repositories.NewShtemsRepository(shtemsDB)
 	categoriesRepository := repositories.NewCategoriesRepository(categoriesDB)
 	adminTokenRepository := repositories.NewAdminTokenRepository(adminTokenDB)
+	adminRepository := repositories.NewAdminRepository(adminDB)
 
 	log.Println("init services")
 	questionsService := services.NewQuestionsService(questionsRepository)
 	shtemsService := services.NewShtemsService(shtemsRepository)
 	categoriesService := services.NewCategoriesService(categoriesRepository)
 	adminTokenService := services.NewAdminTokenService(adminTokenRepository)
+	adminService := services.NewAdminService(adminRepository)
 
 	log.Println("init handlers")
 	apiHandler := handlers.NewAPIHandler(cfg, questionsService, shtemsService, categoriesService)
-	adminHandler := handlers.NewAdminHandler(cfg, adminTokenService)
+	adminHandler := handlers.NewAdminHandler(cfg, adminTokenService, adminService)
 
 	apiRouter := api.NewAPIRouter(cfg, apiHandler, adminHandler)
 	apiApp, err := api.NewAPIServer(apiRouter)

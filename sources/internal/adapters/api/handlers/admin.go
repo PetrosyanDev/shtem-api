@@ -14,6 +14,7 @@ import (
 type adminHandler struct {
 	cfg               *configs.Configs
 	adminTokenService ports.AdminTokenService
+	adminService      ports.AdminService
 }
 
 const cookieMaxAge = 1 * 60 * 60 // 1 hour
@@ -36,9 +37,11 @@ func (h *adminHandler) GenerateToken() gin.HandlerFunc {
 func NewAdminHandler(
 	cfg *configs.Configs,
 	adminTokenService ports.AdminTokenService,
+	adminService ports.AdminService,
 ) *adminHandler {
 	return &adminHandler{
 		cfg,
 		adminTokenService,
+		adminService,
 	}
 }
