@@ -143,13 +143,26 @@ func (q *adminDB) Update(adm *domain.Admin) domain.Error {
 // DELETE!
 func (q *adminDB) Delete(id int64) domain.Error {
 	// DELETE!
+	query_token := fmt.Sprintf(`
+		DELETE FROM %s
+		WHERE %s=$1`,
+		adminTokenTableName,
+		adminTokenTableComponents.admin_id,
+	)
 	query := fmt.Sprintf(`
 		DELETE FROM %s 
 		WHERE %s=$1`,
 		adminTableName,
 		adminTableComponents.id,
 	)
-	_, err := q.db.Exec(q.ctx, query,
+	_, err := q.db.Exec(q.ctx, query_token,
+		id,
+	)
+	if err != nil {
+		return domain.NewError().SetError(err)
+	}
+
+	_, err = q.db.Exec(q.ctx, query,
 		id,
 	)
 	if err != nil {

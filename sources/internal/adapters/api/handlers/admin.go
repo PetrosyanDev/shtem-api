@@ -8,6 +8,7 @@ import (
 	"shtem-api/sources/internal/configs"
 	"shtem-api/sources/internal/core/domain"
 	"shtem-api/sources/internal/core/ports"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -150,6 +151,24 @@ func (h *adminHandler) Update() gin.HandlerFunc {
 }
 func (h *adminHandler) Delete() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		// GET ID
+		userID := ctx.Param("id")
+		if userID == "" {
+			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
+			return
+		}
+
+		id, _ := strconv.Atoi(userID)
+
+		// DELETE ADMIN
+		err := h.adminService.Delete(int64(id))
+		if err != nil {
+			log.Printf("adminHandler:Delete (%v)", err.RawError())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		dto.WriteResponse(ctx, id)
 	}
 }
 
