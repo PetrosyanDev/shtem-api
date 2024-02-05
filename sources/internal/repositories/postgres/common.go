@@ -26,6 +26,12 @@ type CategoriesDB interface {
 	GetShtemsByCategoryLinkName(c_linkName string) ([]*domain.Shtemaran, domain.Error)
 }
 
+type AdminDB interface {
+	Create(username, password, token string) (*domain.Admin, domain.Error)
+	Update(adm *domain.Admin) domain.Error
+	Delete(id int64) domain.Error
+}
+
 type AdminTokenDB interface {
 	GenerateToken() (*domain.AdminToken, domain.Error)
 	GetToken(token string) (*domain.AdminToken, domain.Error)
