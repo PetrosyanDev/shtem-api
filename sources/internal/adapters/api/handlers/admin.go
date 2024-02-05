@@ -41,6 +41,26 @@ func (h *adminHandler) GenerateToken() gin.HandlerFunc {
 	}
 }
 
+func (h *adminHandler) Check() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+		c, _ := ctx.Cookie("session")
+
+		u, err := h.adminService.GetByToken(c)
+		if err != nil {
+			log.Printf("adminHandler:CHECK (%s)", err.GetMessage())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		dto.WriteResponse(ctx, fmt.Sprintf(
+			`Cookie %s has been set
+			Username %s Password %s`,
+			c, u.Username, u.Password,
+		), http.StatusCreated)
+	}
+}
+
 func NewAdminHandler(
 	cfg *configs.Configs,
 	adminTokenService ports.AdminTokenService,

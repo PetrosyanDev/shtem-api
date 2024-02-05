@@ -13,6 +13,10 @@ func (q *adminService) Create(username, password string) (*domain.Admin, domain.
 	return q.adminRepository.Create(username, password)
 }
 
+func (q *adminService) GetByToken(token string) (*domain.Admin, domain.Error) {
+	return q.adminRepository.GetByToken(token)
+}
+
 func (q *adminService) Update(adm *domain.Admin) domain.Error {
 	return q.adminRepository.Update(adm)
 }

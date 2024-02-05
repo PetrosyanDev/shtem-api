@@ -13,6 +13,10 @@ func (p *adminRepository) Create(username, password string) (*domain.Admin, doma
 	return p.db.Create(username, password)
 }
 
+func (p *adminRepository) GetByToken(token string) (*domain.Admin, domain.Error) {
+	return p.db.GetByToken(token)
+}
+
 func (p *adminRepository) Update(adm *domain.Admin) domain.Error {
 	return p.db.Update(adm)
 }

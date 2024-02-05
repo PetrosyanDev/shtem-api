@@ -33,7 +33,7 @@ func NewAPIRouter(cfg *configs.Configs, apiHandler ports.APIHandler, adminHandle
 		// AUTH
 		admin := apiV1.Group("/admin").Use(adminHandler.ValidateToken())
 
-		admin.GET("/shtems", apiHandler.GetShtems())
+		admin.GET("/check", adminHandler.Check())
 	}
 	apiV1.GET("/create", adminHandler.GenerateToken())
 

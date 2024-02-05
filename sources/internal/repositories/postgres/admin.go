@@ -70,6 +70,48 @@ func (a *adminDB) Create(username, password string) (*domain.Admin, domain.Error
 	return &adm, nil
 }
 
+// GET
+// GET
+// GET
+func (a *adminDB) GetByToken(token string) (*domain.Admin, domain.Error) {
+
+	query := fmt.Sprintf(`
+		SELECT %s, %s 
+		FROM %s
+		JOIN %s
+		ON %s=%s
+		WHERE %s=$1
+		`,
+		// SELECT
+		adminTableComponents.username,
+		adminTableComponents.password,
+		// FROM
+		adminTableName,
+		// JOIN
+		adminTokenTableName,
+		// ON
+		adminTableComponents.id,
+		adminTokenTableComponents.admin_id,
+		// WHERE
+		adminTokenTableComponents.token,
+	)
+
+	adm := domain.Admin{}
+
+	err := a.db.QueryRow(a.ctx, query,
+		token,
+	).Scan(
+		&adm.Username,
+		&adm.Password,
+	)
+	if err != nil {
+		log.Println(err)
+		return nil, domain.NewError().SetError(err)
+	}
+
+	return &adm, nil
+}
+
 // UPDATE!
 // UPDATE!
 // UPDATE!
