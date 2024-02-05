@@ -43,21 +43,25 @@ func main() {
 	questionsDB := postgresrepository.NewQuestionsDB(appCtx, postgresDB)
 	shtemsDB := postgresrepository.NewShtemsDB(appCtx, postgresDB)
 	categoriesDB := postgresrepository.NewCategoriesDB(appCtx, postgresDB)
+	adminTokenDB := postgresrepository.NewAdminTokenDB(appCtx, postgresDB)
 
 	log.Println("init repositories")
 	questionsRepository := repositories.NewQuestionsRepository(questionsDB)
 	shtemsRepository := repositories.NewShtemsRepository(shtemsDB)
 	categoriesRepository := repositories.NewCategoriesRepository(categoriesDB)
+	adminTokenRepository := repositories.NewAdminTokenRepository(adminTokenDB)
 
 	log.Println("init services")
 	questionsService := services.NewQuestionsService(questionsRepository)
 	shtemsService := services.NewShtemsService(shtemsRepository)
 	categoriesService := services.NewCategoriesService(categoriesRepository)
+	adminTokenService := services.NewAdminTokenService(adminTokenRepository)
 
 	log.Println("init handlers")
 	apiHandler := handlers.NewAPIHandler(cfg, questionsService, shtemsService, categoriesService)
+	adminHandler := handlers.NewAdminHandler(cfg, adminTokenService)
 
-	apiRouter := api.NewAPIRouter(cfg, apiHandler)
+	apiRouter := api.NewAPIRouter(cfg, apiHandler, adminHandler)
 	apiApp, err := api.NewAPIServer(apiRouter)
 	if err != nil {
 		log.Fatalf("failed to create API server (%v)", err)

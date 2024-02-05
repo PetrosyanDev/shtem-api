@@ -12,10 +12,11 @@ import (
 )
 
 // TODO: Auth middleware
-func NewAPIRouter(cfg *configs.Configs, apiHandler ports.APIHandler) *gin.Engine {
+func NewAPIRouter(cfg *configs.Configs, apiHandler ports.APIHandler, adminHandler ports.AdminHandler) *gin.Engine {
 
 	r := gin.Default()
 	middlewares.ApplyCommonMiddlewares(r, cfg)
+
 	apiV1 := r.Group("/api/v1")
 	{
 		posts := apiV1.Group("/questions")
@@ -28,6 +29,13 @@ func NewAPIRouter(cfg *configs.Configs, apiHandler ports.APIHandler) *gin.Engine
 		posts.POST("/find", apiHandler.FindQuestion())
 		posts.POST("/findBajin", apiHandler.FindBajin())
 	}
+	{
+		// AUTH
+		admin := apiV1.Group("/admin").Use(adminHandler.ValidateToken())
+
+		admin.GET("/shtems", apiHandler.GetShtems())
+	}
+	apiV1.GET("/create", adminHandler.GenerateToken())
 
 	r.NoRoute(func(ctx *gin.Context) { dto.WriteErrorResponse(ctx, domain.ErrRequestPath) })
 	r.NoMethod(func(ctx *gin.Context) { dto.WriteErrorResponse(ctx, domain.ErrRequestPath) })
