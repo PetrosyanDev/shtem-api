@@ -32,4 +32,7 @@ type AdminHandler interface {
 
 type AdminQuestionsHandler interface {
 	Create() gin.HandlerFunc
+	Get() gin.HandlerFunc
+	Update() gin.HandlerFunc
+	Delete() gin.HandlerFunc
 }
