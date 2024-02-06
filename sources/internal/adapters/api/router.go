@@ -31,7 +31,6 @@ func NewAPIRouter(
 		posts.DELETE("/:id/delete", apiHandler.Delete())
 
 		posts.POST("/getShtems", apiHandler.GetShtems())
-		posts.POST("/find", apiHandler.FindQuestion())
 		posts.POST("/findBajin", apiHandler.FindBajin())
 
 		// LOGIN
@@ -53,15 +52,17 @@ func NewAPIRouter(
 		admins.POST("/create", adminHandler.Create())
 		admins.POST("/get", adminHandler.GetUsers())
 		admins.POST("/update", adminHandler.Update())
-		admins.POST("/:id/delete", adminHandler.Delete())
+		admins.DELETE("/:id/delete", adminHandler.Delete())
 	}
 	{
 		questions := admin.Group("/questions")
 
-		questions.POST("/create", adminHandler.Create())
-		questions.POST("/:id", adminHandler.GetUsers())
-		questions.POST("/:id/update", adminHandler.Update())
-		questions.POST("/:id/delete", adminHandler.Delete())
+		questions.POST("/create", adminQuestionHandler.Create())
+		questions.POST("/:id", adminQuestionHandler.Get())
+		questions.POST("/:id/update", adminQuestionHandler.Update())
+		questions.DELETE("/:id/delete", adminQuestionHandler.Delete())
+
+		questions.POST("/:id/delete", adminQuestionHandler.Delete())
 	}
 
 	r.NoRoute(func(ctx *gin.Context) { dto.WriteErrorResponse(ctx, domain.ErrRequestPath) })

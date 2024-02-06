@@ -62,7 +62,6 @@ func (h *adminHandler) Check() gin.HandlerFunc {
 		), http.StatusCreated)
 	}
 }
-
 func (h *adminHandler) Login() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
@@ -156,7 +155,6 @@ func (h *adminHandler) Create() gin.HandlerFunc {
 		dto.WriteResponse(ctx, resp, http.StatusCreated)
 	}
 }
-
 func (h *adminHandler) Update() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// Bind Request
