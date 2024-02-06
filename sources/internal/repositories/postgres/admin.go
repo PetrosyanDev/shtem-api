@@ -237,12 +237,13 @@ func (a *adminDB) GetAdmins() (*[]*domain.Admin, domain.Error) {
 		adm := domain.Admin{}
 
 		if err := rows.Scan(
-			adm.ID,
-			adm.CreatedAt,
-			adm.UpdatedAt,
-			adm.Username,
-			adm.Password,
+			&adm.ID,
+			&adm.CreatedAt,
+			&adm.UpdatedAt,
+			&adm.Username,
+			&adm.Password,
 		); err != nil {
+			log.Println(err)
 			return nil, domain.NewError().SetError(err)
 		}
 

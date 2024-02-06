@@ -13,6 +13,7 @@ type AdminHandler interface {
 	Check() gin.HandlerFunc
 
 	Create() gin.HandlerFunc
+	GetUsers() gin.HandlerFunc
 	Update() gin.HandlerFunc
 	Delete() gin.HandlerFunc
 }
