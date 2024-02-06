@@ -63,6 +63,56 @@ func (h *adminHandler) Check() gin.HandlerFunc {
 	}
 }
 
+func (h *adminHandler) Login() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+		// Check Token
+		c, _ := ctx.Cookie("session")
+
+		_, err := h.adminTokenService.GetToken(c)
+		if err == nil {
+			dto.WriteErrorResponse(ctx, domain.NewError().SetMessage("have token").SetStatus(200))
+			return
+		}
+
+		// Bind Request
+		req := new(dto.AdminLoginRequest)
+		if err := ctx.BindJSON(&req); err != nil {
+			log.Printf("adminHandler:Login (%v)", err)
+			dto.WriteErrorResponse(ctx, domain.ErrAccessDenied)
+			return
+		}
+
+		// Convert to question
+		adm := new(domain.Admin)
+		if err := req.ToDomain(adm); err != nil {
+			log.Printf("adminHandler:Login1 (%s)", err.GetMessage())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		// Find User
+		admin, err := h.adminService.GetByUsername(adm.Username)
+		if err != nil {
+			log.Printf("adminHandler:Login2 (%s)", err.GetMessage())
+			dto.WriteErrorResponse(ctx, domain.ErrAccessDenied)
+			return
+		}
+
+		// Check
+		if admin.Password != adm.Password {
+			dto.WriteErrorResponse(ctx, domain.ErrAccessDenied)
+			return
+		}
+
+		// Responce
+		resp := new(dto.AdminResponse)
+		resp.FromDomain(admin)
+		dto.WriteResponse(ctx, resp, http.StatusCreated)
+
+	}
+}
+
 func (h *adminHandler) Create() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 

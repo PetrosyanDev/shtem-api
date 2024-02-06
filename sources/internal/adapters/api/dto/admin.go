@@ -5,6 +5,26 @@ import (
 	"time"
 )
 
+// Login
+type AdminLoginRequest struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+type AdminLoginResponce struct {
+	ID        int64     `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	Username  string    `json:"username"`
+	Password  string    `json:"password"`
+}
+
+func (r *AdminLoginRequest) ToDomain(p *domain.Admin) domain.Error {
+	p.Username = r.Username
+	p.Password = r.Password
+	return nil
+}
+
 // CREATE
 type AdminCreateRequest struct {
 	Username string `json:"username" binding:"required"`
