@@ -6,18 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type AdminHandler interface {
-	GenerateToken() gin.HandlerFunc
-	ValidateToken() gin.HandlerFunc
-
-	Check() gin.HandlerFunc
-
-	Create() gin.HandlerFunc
-	GetUsers() gin.HandlerFunc
-	Update() gin.HandlerFunc
-	Delete() gin.HandlerFunc
-}
-
 type AdminService interface {
 	// CRUD
 	Create(username, password string) (*domain.Admin, domain.Error)
@@ -27,4 +15,21 @@ type AdminService interface {
 
 	GetByUsername(username string) (*domain.Admin, domain.Error)
 	GetAdmins() (*[]*domain.Admin, domain.Error)
+}
+
+type AdminHandler interface {
+	GenerateToken() gin.HandlerFunc
+	ValidateToken() gin.HandlerFunc
+
+	Check() gin.HandlerFunc
+	Login() gin.HandlerFunc
+
+	Create() gin.HandlerFunc
+	GetUsers() gin.HandlerFunc
+	Update() gin.HandlerFunc
+	Delete() gin.HandlerFunc
+}
+
+type AdminQuestionsHandler interface {
+	Create() gin.HandlerFunc
 }
