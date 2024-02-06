@@ -12,7 +12,12 @@ import (
 )
 
 // TODO: Auth middleware
-func NewAPIRouter(cfg *configs.Configs, apiHandler ports.APIHandler, adminHandler ports.AdminHandler) *gin.Engine {
+func NewAPIRouter(
+	cfg *configs.Configs,
+	apiHandler ports.APIHandler,
+	adminHandler ports.AdminHandler,
+	adminQuestionHandler ports.AdminQuestionsHandler,
+) *gin.Engine {
 
 	r := gin.Default()
 	middlewares.ApplyCommonMiddlewares(r, cfg)
@@ -28,22 +33,36 @@ func NewAPIRouter(cfg *configs.Configs, apiHandler ports.APIHandler, adminHandle
 		posts.POST("/getShtems", apiHandler.GetShtems())
 		posts.POST("/find", apiHandler.FindQuestion())
 		posts.POST("/findBajin", apiHandler.FindBajin())
-	}
 
-	// ADMIN
-	admin := apiV1.Group("/admin").Use(adminHandler.ValidateToken())
-	{
-		admin.GET("/check", adminHandler.Check())
-
-		admin.POST("/admins/create", adminHandler.Create())
-		admin.POST("/admins/get", adminHandler.GetUsers())
-		admin.POST("/admins/update", adminHandler.Update())
-		admin.POST("/admins/:id/delete", adminHandler.Delete())
-
+		// LOGIN
+		apiV1.POST("/login", adminHandler.Login())
 	}
 
 	// OTHER
-	apiV1.GET("/create", adminHandler.GenerateToken())
+
+	// ADMIN
+	admin := apiV1.Group("/admin")
+	// SECURITY
+	admin.Use(adminHandler.ValidateToken())
+	{
+		admin.GET("/check", adminHandler.Check())
+	}
+	{
+		admins := admin.Group("/admins")
+
+		admins.POST("/create", adminHandler.Create())
+		admins.POST("/get", adminHandler.GetUsers())
+		admins.POST("/update", adminHandler.Update())
+		admins.POST("/:id/delete", adminHandler.Delete())
+	}
+	{
+		questions := admin.Group("/questions")
+
+		questions.POST("/create", adminHandler.Create())
+		questions.POST("/:id", adminHandler.GetUsers())
+		questions.POST("/:id/update", adminHandler.Update())
+		questions.POST("/:id/delete", adminHandler.Delete())
+	}
 
 	r.NoRoute(func(ctx *gin.Context) { dto.WriteErrorResponse(ctx, domain.ErrRequestPath) })
 	r.NoMethod(func(ctx *gin.Context) { dto.WriteErrorResponse(ctx, domain.ErrRequestPath) })
