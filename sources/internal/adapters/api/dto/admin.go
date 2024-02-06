@@ -101,3 +101,25 @@ func (r *AdminResponse) FromDomain(p *domain.Admin) {
 	r.Data.Token.UpdatedAt = p.Token.UpdatedAt
 	r.Data.Token.Expiry = p.Token.Expiry
 }
+
+type AdminsResponse struct {
+	Response[[]AdminResponseData]
+}
+
+func (r *AdminsResponse) SliceFromDomain(admins []*domain.Admin) {
+	r.Data = new([]AdminResponseData)
+
+	// Initialize the underlying slice
+	*r.Data = make([]AdminResponseData, len(admins))
+
+	for index, q := range admins {
+		(*r.Data)[index] = AdminResponseData{
+			ID:        q.ID,
+			CreatedAt: q.CreatedAt,
+			UpdatedAt: q.UpdatedAt,
+			Username:  q.Username,
+			Password:  q.Password,
+		}
+	}
+
+}
