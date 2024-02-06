@@ -171,6 +171,24 @@ func (h *adminHandler) Delete() gin.HandlerFunc {
 		dto.WriteResponse(ctx, id)
 	}
 }
+func (h *adminHandler) GetUsers() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+		// GET ADMINS
+		admins, err := h.adminService.GetAdmins()
+		if err != nil {
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		log.Println(admins)
+
+		// Responce
+		resp := new(dto.AdminsResponse)
+		resp.SliceFromDomain(*admins)
+		dto.WriteResponse(ctx, resp, http.StatusCreated)
+	}
+}
 
 func (h *adminHandler) ValidateToken() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
