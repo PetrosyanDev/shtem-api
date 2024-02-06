@@ -152,10 +152,11 @@ func (q *questionsDB) FindQuestion(question *domain.Question) (*domain.Question,
 
 	// FIND!
 	query := fmt.Sprintf(`
-		SELECT %s, %s, %s, %s, %s, %s, %s 
+		SELECT %s, %s, %s, %s, %s, %s, %s, %s 
 		FROM %s 
 		WHERE %s=$1 AND %s=$2 AND %s=$3 AND %s=$4`,
 		// SELECT
+		questionsTableComponents.q_id,
 		questionsTableComponents.bajin,
 		questionsTableComponents.mas,
 		questionsTableComponents.q_number,
@@ -179,6 +180,7 @@ func (q *questionsDB) FindQuestion(question *domain.Question) (*domain.Question,
 		question.Q_number).
 		Scan(
 			// SELECTED
+			&result.Q_id,
 			&result.Bajin,
 			&result.Mas,
 			&result.Q_number,
