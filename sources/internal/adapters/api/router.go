@@ -62,7 +62,7 @@ func NewAPIRouter(
 		questions.POST("/:id/update", adminQuestionHandler.Update())
 		questions.DELETE("/:id/delete", adminQuestionHandler.Delete())
 
-		questions.POST("/:id/delete", adminQuestionHandler.Delete())
+		questions.POST("/find-bajin", adminQuestionHandler.FindBajin())
 	}
 
 	r.NoRoute(func(ctx *gin.Context) { dto.WriteErrorResponse(ctx, domain.ErrRequestPath) })

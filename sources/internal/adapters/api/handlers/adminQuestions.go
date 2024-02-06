@@ -178,6 +178,38 @@ func (h *adminQuestionHandler) Delete() gin.HandlerFunc {
 	}
 }
 
+func (h *adminQuestionHandler) FindBajin() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		// Bind Request
+		req := new(dto.FindQuestionRequest)
+		if err := ctx.BindJSON(req); err != nil {
+			log.Printf("apiHandler:Find (%v)", err)
+			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
+			return
+		}
+
+		// Convert to question
+		question := new(domain.Question)
+		if err := req.ToDomain(question, h.shtemsService); err != nil {
+			log.Printf("apiHandler:Find (%s)", err.GetMessage())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		// FIND QUESTION
+		final_q, err := h.questionsService.FindBajin(question)
+		if err != nil {
+			log.Printf("apiHandler:Find (%v)", err.RawError())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		resp := new(dto.BajinResponse)
+		resp.SliceFromDomain(final_q)
+		dto.WriteResponse(ctx, resp)
+	}
+}
+
 func NewAdminQuestionHandler(
 	cfg *configs.Configs,
 	questionsService ports.QuestionsService,
