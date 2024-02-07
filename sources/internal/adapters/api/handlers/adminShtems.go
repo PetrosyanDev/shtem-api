@@ -38,7 +38,7 @@ func (h *adminShtemsHandler) Create() gin.HandlerFunc {
 		}
 
 		// Try to find shtem
-		if _, err := h.shtemsService.GetShtemByLinkName(shtem.LinkName); err == nil {
+		if _, err := h.shtemsService.GetShtemByLinkName(shtem.LinkName); err != nil {
 			log.Println("adminShtemHandler:Exists")
 			dto.WriteErrorResponse(ctx, domain.NewError().SetMessage("ALREADY EXISTS"))
 			return
@@ -126,14 +126,6 @@ func (h *adminShtemsHandler) Update() gin.HandlerFunc {
 			return
 		}
 
-		// Convert to shtem
-		shtem := new(domain.Shtemaran)
-		if err := req.ToDomain(shtem); err != nil {
-			log.Printf("adminShtemHandler:Update1 (%s)", err.GetMessage())
-			dto.WriteErrorResponse(ctx, err)
-			return
-		}
-
 		// GET ID ADD TO QUESTION
 		shtemID := ctx.Param("id")
 		if shtemID == "" {
@@ -143,11 +135,22 @@ func (h *adminShtemsHandler) Update() gin.HandlerFunc {
 		id, _ := strconv.Atoi(shtemID)
 
 		// CHECK IF SHTEM EXISTS
-		if _, err := h.shtemsService.FindById(int64(id)); err != nil {
+		shtemaran, err := h.shtemsService.FindById(int64(id))
+		if err != nil {
 			log.Printf("adminShtemHandler:Update2 (%v)", err.RawError())
 			dto.WriteErrorResponse(ctx, domain.NewError().SetMessage("DOESNT EXIST"))
 			return
 		}
+
+		// Convert to shtem
+		shtem := new(domain.Shtemaran)
+		if err := req.ToDomain(shtem, shtemaran); err != nil {
+			log.Printf("adminShtemHandler:Update1 (%s)", err.GetMessage())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		shtem.Id = int64(id)
 
 		// UPDATE SHTEM
 		if err := h.shtemsService.Update(shtem); err != nil {

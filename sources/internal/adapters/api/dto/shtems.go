@@ -89,7 +89,7 @@ type UpdateShtemResponce struct {
 	Category    int64    `json:"category" binding:"required"`
 }
 
-func (r *UpdateShtemRequest) ToDomain(p *domain.Shtemaran) domain.Error {
+func (r *UpdateShtemRequest) ToDomain(p *domain.Shtemaran, shtemaran *domain.Shtemaran) domain.Error {
 	p.Name = r.Name
 	p.Description = r.Description
 	p.Author = r.Author
@@ -98,6 +98,31 @@ func (r *UpdateShtemRequest) ToDomain(p *domain.Shtemaran) domain.Error {
 	p.PDF = r.PDF
 	p.Keywords = r.Keywords
 	p.Category = r.Category
+
+	if p.Name == "" {
+		p.Name = shtemaran.Name
+	}
+	if p.Description == "" {
+		p.Description = shtemaran.Description
+	}
+	if p.Author == "" {
+		p.Author = shtemaran.Author
+	}
+	if p.LinkName == "" {
+		p.LinkName = shtemaran.LinkName
+	}
+	if p.Image == "" {
+		p.Image = shtemaran.Image
+	}
+	if p.PDF == "" {
+		p.PDF = shtemaran.PDF
+	}
+	if p.Keywords == nil {
+		p.Keywords = shtemaran.Keywords
+	}
+	if p.Category == 0 {
+		p.Category = shtemaran.Category
+	}
 
 	return nil
 }
@@ -127,6 +152,8 @@ type ShtemsResponce struct {
 }
 
 func (r *ShtemResponse) FromDomain(p *domain.Shtemaran) domain.Error {
+	r.Data = new(ShtemResponceData)
+	r.Data.Id = p.Id
 	r.Data.Name = p.Name
 	r.Data.Description = p.Description
 	r.Data.Author = p.Author
