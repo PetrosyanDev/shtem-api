@@ -93,6 +93,53 @@ func (q *shtemsDB) Create(shtemaran *domain.Shtemaran) domain.Error {
 // UPDATE!
 // UPDATE!
 // UPDATE!
+func (q *shtemsDB) FindById(id int64) (*domain.Shtemaran, domain.Error) {
+
+	query := fmt.Sprintf(`
+		SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s
+		FROM %s 
+		WHERE %s=$1`,
+		// SELECT
+		shtemsTableComponents.id,
+		shtemsTableComponents.name,
+		shtemsTableComponents.description,
+		shtemsTableComponents.author,
+		shtemsTableComponents.link_name,
+		shtemsTableComponents.image,
+		shtemsTableComponents.pdf,
+		shtemsTableComponents.keywords,
+		shtemsTableComponents.category,
+		// FROM
+		shtemsTableName,
+		// WHERE
+		shtemsTableComponents.id, // shtems
+	)
+
+	res := domain.Shtemaran{}
+
+	err := q.db.QueryRow(q.ctx, query,
+		id,
+	).Scan(
+		&res.Id,
+		&res.Name,
+		&res.Description,
+		&res.Author,
+		&res.LinkName,
+		&res.Image,
+		&res.PDF,
+		&res.Keywords,
+		&res.Category,
+	)
+	if err != nil {
+		return nil, domain.NewError().SetError(err)
+	}
+
+	return &res, nil
+}
+
+// UPDATE!
+// UPDATE!
+// UPDATE!
 func (q *shtemsDB) Update(shtemaran *domain.Shtemaran) domain.Error {
 
 	query := fmt.Sprintf(`
