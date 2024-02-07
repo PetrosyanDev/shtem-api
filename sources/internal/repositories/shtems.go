@@ -9,6 +9,15 @@ type shtemsRepository struct {
 	db postgresrepository.ShtemsDB
 }
 
+func (p *shtemsRepository) Create(shtemaran *domain.Shtemaran) domain.Error {
+	return p.db.Create(shtemaran)
+}
+func (p *shtemsRepository) Update(shtemaran *domain.Shtemaran) domain.Error {
+	return p.db.Update(shtemaran)
+}
+func (p *shtemsRepository) Delete(id int64) domain.Error {
+	return p.db.Delete(id)
+}
 func (p *shtemsRepository) GetShtems() ([]*domain.Shtemaran, domain.Error) {
 	return p.db.GetShtems()
 }
