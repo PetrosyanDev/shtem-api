@@ -69,7 +69,8 @@ func NewAPIRouter(
 		shtems := admin.Group("/shtems")
 
 		shtems.POST("/create", adminShtemsHandler.Create())
-		shtems.POST("/:id", adminShtemsHandler.Find())
+		shtems.POST("/:id", adminShtemsHandler.FindById())
+		shtems.POST("/find", adminShtemsHandler.FindByLinkName())
 		shtems.POST("/:id/update", adminShtemsHandler.Update())
 		shtems.POST("/:id/cover/upload", adminShtemsHandler.Cover())
 		shtems.DELETE("/:id/delete", adminShtemsHandler.Delete())

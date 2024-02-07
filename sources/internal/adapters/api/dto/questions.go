@@ -140,10 +140,6 @@ type BajinResponse struct {
 	Response[[]QuestionResponseData]
 }
 
-type ShtemsResponce struct {
-	Response[[]string]
-}
-
 func (r *QuestionResponse) FromDomain(p *domain.Question) {
 	r.Data = new(QuestionResponseData)
 	r.Data.ID = p.Q_id

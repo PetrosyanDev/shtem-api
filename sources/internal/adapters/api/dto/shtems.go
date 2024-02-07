@@ -102,4 +102,39 @@ func (r *UpdateShtemRequest) ToDomain(p *domain.Shtemaran) domain.Error {
 	return nil
 }
 
-// DELETE
+// GLOBAL
+// GLOBAL
+// GLOBAL
+
+type ShtemResponceData struct {
+	Id          int64    `json:"id" binding:"required"`
+	Name        string   `json:"name" binding:"required"`
+	Description string   `json:"description"`
+	Author      string   `json:"author"`
+	LinkName    string   `json:"link-name" binding:"required"`
+	Image       string   `json:"image"`
+	PDF         string   `json:"pdf"`
+	Keywords    []string `json:"keywords"`
+	Category    int64    `json:"category" binding:"required"`
+}
+
+type ShtemResponse struct {
+	Response[ShtemResponceData]
+}
+
+type ShtemsResponce struct {
+	Response[[]string]
+}
+
+func (r *ShtemResponse) FromDomain(p *domain.Shtemaran) domain.Error {
+	r.Data.Name = p.Name
+	r.Data.Description = p.Description
+	r.Data.Author = p.Author
+	r.Data.LinkName = p.LinkName
+	r.Data.Image = p.Image
+	r.Data.PDF = p.PDF
+	r.Data.Keywords = p.Keywords
+	r.Data.Category = p.Category
+
+	return nil
+}
