@@ -127,6 +127,11 @@ func (r *UpdateShtemRequest) ToDomain(p *domain.Shtemaran, shtemaran *domain.Sht
 	return nil
 }
 
+// UPDATE COVER
+type UploadCoverShtemRequest struct {
+	Data64 string `json:"data64" binding:"required"`
+}
+
 // GLOBAL
 // GLOBAL
 // GLOBAL

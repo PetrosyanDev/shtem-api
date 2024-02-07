@@ -166,6 +166,36 @@ func (h *adminShtemsHandler) Update() gin.HandlerFunc {
 }
 func (h *adminShtemsHandler) Cover() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		req := new(dto.UploadCoverShtemRequest)
+		if err := ctx.BindJSON(req); err != nil {
+			log.Printf("adminQuestionHandler:UploadBlockMedia (%v)", err)
+			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
+			return
+		}
+
+		// GET ID
+		shtemID := ctx.Param("id")
+		if shtemID == "" {
+			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
+			return
+		}
+		id, _ := strconv.Atoi(shtemID)
+
+		_, err := h.shtemsService.FindById(int64(id))
+		if err != nil {
+			log.Printf("adminQuestionHandler:UploadBlockMedia (%v)", err)
+			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
+			return
+		}
+		if err := ctx.BindJSON(req); err != nil {
+			log.Printf("adminQuestionHandler:UploadBlockMedia (%v)", err)
+			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
+			return
+		}
+
+		// file, err := h.filesService.CreateFileFromBase64(int64(id), false, req.Data64)
+		// TODO
+		return
 	}
 }
 func (h *adminShtemsHandler) Delete() gin.HandlerFunc {
