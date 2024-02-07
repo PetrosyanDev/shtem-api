@@ -47,3 +47,10 @@ type AdminShtemsHandler interface {
 	Cover() gin.HandlerFunc
 	Delete() gin.HandlerFunc
 }
+
+type AdminCategoriesHandler interface {
+	Create() gin.HandlerFunc
+	Find() gin.HandlerFunc
+	Update() gin.HandlerFunc
+	Delete() gin.HandlerFunc
+}

@@ -18,6 +18,7 @@ func NewAPIRouter(
 	adminHandler ports.AdminHandler,
 	adminQuestionHandler ports.AdminQuestionsHandler,
 	adminShtemsHandler ports.AdminShtemsHandler,
+	adminCategoriesHandler ports.AdminCategoriesHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -72,8 +73,16 @@ func NewAPIRouter(
 		shtems.POST("/:id", adminShtemsHandler.FindById())
 		shtems.POST("/find", adminShtemsHandler.FindByLinkName())
 		shtems.POST("/:id/update", adminShtemsHandler.Update())
-		shtems.POST("/:id/cover/upload", adminShtemsHandler.Cover())
+		// shtems.POST("/:id/cover/upload", adminShtemsHandler.Cover())
 		shtems.DELETE("/:id/delete", adminShtemsHandler.Delete())
+	}
+	{
+		categories := admin.Group("/categories")
+
+		categories.POST("/create", adminShtemsHandler.Create())
+		categories.POST("/:id", adminShtemsHandler.FindById())
+		categories.POST("/:id/update", adminShtemsHandler.Update())
+		categories.DELETE("/:id/delete", adminShtemsHandler.Delete())
 	}
 
 	r.NoRoute(func(ctx *gin.Context) { dto.WriteErrorResponse(ctx, domain.ErrRequestPath) })

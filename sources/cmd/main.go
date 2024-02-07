@@ -65,8 +65,9 @@ func main() {
 	adminHandler := handlers.NewAdminHandler(cfg, adminTokenService, adminService)
 	adminQuestionHandler := handlers.NewAdminQuestionHandler(cfg, questionsService, shtemsService, adminService)
 	adminShtemsHandler := handlers.NewAdminShtemsHandler(cfg, questionsService, shtemsService, adminService)
+	adminCategoriesHandler := handlers.NewAdminCategoriesHandler(cfg, shtemsService, categoriesService, adminService)
 
-	apiRouter := api.NewAPIRouter(cfg, apiHandler, adminHandler, adminQuestionHandler, adminShtemsHandler)
+	apiRouter := api.NewAPIRouter(cfg, apiHandler, adminHandler, adminQuestionHandler, adminShtemsHandler, adminCategoriesHandler)
 	apiApp, err := api.NewAPIServer(apiRouter)
 	if err != nil {
 		log.Fatalf("failed to create API server (%v)", err)
