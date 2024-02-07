@@ -63,7 +63,7 @@ func (h *adminShtemsHandler) FindByLinkName() gin.HandlerFunc {
 		// Bind Request
 		req := new(dto.FindShtemRequest)
 		if err := ctx.BindJSON(req); err != nil {
-			log.Printf("adminQuestionHandler:Get (%v)", err)
+			log.Printf("adminShtemHandler:Get (%v)", err)
 			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
 			return
 		}
@@ -71,7 +71,7 @@ func (h *adminShtemsHandler) FindByLinkName() gin.HandlerFunc {
 		// Convert to question
 		shtem := new(domain.Shtemaran)
 		if err := req.ToDomain(shtem); err != nil {
-			log.Printf("adminQuestionHandler:Get1 (%s)", err.GetMessage())
+			log.Printf("adminShtemHandler:Get1 (%s)", err.GetMessage())
 			dto.WriteErrorResponse(ctx, err)
 			return
 		}
@@ -79,7 +79,7 @@ func (h *adminShtemsHandler) FindByLinkName() gin.HandlerFunc {
 		// FIND SHTEM
 		final_s, err := h.shtemsService.GetShtemByLinkName(shtem.LinkName)
 		if err != nil {
-			log.Printf("adminQuestionHandler:Get2 (%v)", err.RawError())
+			log.Printf("adminShtemHandler:Get2 (%v)", err.RawError())
 			dto.WriteErrorResponse(ctx, err)
 			return
 		}
@@ -105,7 +105,7 @@ func (h *adminShtemsHandler) FindById() gin.HandlerFunc {
 		// FIND SHTEM
 		final_s, err := h.shtemsService.FindById(int64(id))
 		if err != nil {
-			log.Printf("adminQuestionHandler:Get2 (%v)", err.RawError())
+			log.Printf("adminShtemHandler:Get2 (%v)", err.RawError())
 			dto.WriteErrorResponse(ctx, err)
 			return
 		}
@@ -118,6 +118,47 @@ func (h *adminShtemsHandler) FindById() gin.HandlerFunc {
 
 func (h *adminShtemsHandler) Update() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		// Bind Request
+		req := new(dto.UpdateShtemRequest)
+		if err := ctx.BindJSON(req); err != nil {
+			log.Printf("adminShtemHandler:Update (%v)", err)
+			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
+			return
+		}
+
+		// Convert to shtem
+		shtem := new(domain.Shtemaran)
+		if err := req.ToDomain(shtem); err != nil {
+			log.Printf("adminShtemHandler:Update1 (%s)", err.GetMessage())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		// GET ID ADD TO QUESTION
+		shtemID := ctx.Param("id")
+		if shtemID == "" {
+			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
+			return
+		}
+		id, _ := strconv.Atoi(shtemID)
+
+		// CHECK IF SHTEM EXISTS
+		if _, err := h.shtemsService.FindById(int64(id)); err != nil {
+			log.Printf("adminShtemHandler:Update2 (%v)", err.RawError())
+			dto.WriteErrorResponse(ctx, domain.NewError().SetMessage("DOESNT EXIST"))
+			return
+		}
+
+		// UPDATE SHTEM
+		if err := h.shtemsService.Update(shtem); err != nil {
+			log.Printf("adminShtemHandler:Update3 (%v)", err.RawError())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		resp := new(dto.ShtemResponse)
+		resp.FromDomain(shtem)
+		dto.WriteResponse(ctx, resp)
 	}
 }
 func (h *adminShtemsHandler) Cover() gin.HandlerFunc {
@@ -126,6 +167,34 @@ func (h *adminShtemsHandler) Cover() gin.HandlerFunc {
 }
 func (h *adminShtemsHandler) Delete() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		// GET ID
+		shtemID := ctx.Param("id")
+		if shtemID == "" {
+			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
+			return
+		}
+
+		id, _ := strconv.Atoi(shtemID)
+
+		// FIND SHTEM
+		shtem, err := h.shtemsService.FindById(int64(id))
+		if err != nil {
+			log.Printf("adminShtemHandler:Delete (%v)", err.RawError())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		// DELETE SHTEM
+		err = h.questionsService.Delete(int64(id))
+		if err != nil {
+			log.Printf("adminShtemHandler:Delete (%v)", err.RawError())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		resp := new(dto.ShtemResponse)
+		resp.FromDomain(shtem)
+		dto.WriteResponse(ctx, resp)
 	}
 }
 
