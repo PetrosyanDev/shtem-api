@@ -9,6 +9,18 @@ type categoriesRepository struct {
 	db postgresrepository.CategoriesDB
 }
 
+func (p *categoriesRepository) Create(category *domain.Category) domain.Error {
+	return p.db.Create(category)
+}
+func (p *categoriesRepository) FindById(id int64) (*domain.Category, domain.Error) {
+	return p.db.FindById(id)
+}
+func (p *categoriesRepository) Update(category *domain.Category) domain.Error {
+	return p.db.Update(category)
+}
+func (p *categoriesRepository) Delete(id int64) domain.Error {
+	return p.db.Delete(id)
+}
 func (p *categoriesRepository) GetCategories() ([]*domain.Category, domain.Error) {
 	return p.db.GetCategories()
 }

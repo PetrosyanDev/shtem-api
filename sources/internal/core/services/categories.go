@@ -9,6 +9,18 @@ type categoriesService struct {
 	categoriesRepository repositories.CategoriesRepository
 }
 
+func (p *categoriesService) Create(category *domain.Category) domain.Error {
+	return p.categoriesRepository.Create(category)
+}
+func (p *categoriesService) FindById(id int64) (*domain.Category, domain.Error) {
+	return p.categoriesRepository.FindById(id)
+}
+func (p *categoriesService) Update(category *domain.Category) domain.Error {
+	return p.categoriesRepository.Update(category)
+}
+func (p *categoriesService) Delete(id int64) domain.Error {
+	return p.categoriesRepository.Delete(id)
+}
 func (q *categoriesService) GetCategories() ([]*domain.Category, domain.Error) {
 	return q.categoriesRepository.GetCategories()
 }

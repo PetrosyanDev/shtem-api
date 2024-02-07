@@ -4,27 +4,146 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	postgresclient "shtem-api/sources/internal/clients/postgres"
 	"shtem-api/sources/internal/core/domain"
 )
 
 var categoriesTableName = "categories"
 
-var categoriesTableComponents = struct {
+type categoriesTable struct {
 	c_id        string
 	name        string
 	description string
 	link_name   string
-}{
+}
+
+var categoriesTableComponents = categoriesTable{
 	c_id:        categoriesTableName + ".c_id",
 	name:        categoriesTableName + ".name",
 	description: categoriesTableName + ".description",
 	link_name:   categoriesTableName + ".link_name",
 }
+var categoriesTableComponentsNon = categoriesTable{
+	c_id:        "c_id",
+	name:        "name",
+	description: "description",
+	link_name:   "link_name",
+}
 
 type categoriesDB struct {
 	ctx context.Context
 	db  *postgresclient.PostgresDB
+}
+
+// CREATE
+// CREATE
+// CREATE
+func (q *categoriesDB) Create(category *domain.Category) domain.Error {
+
+	query := fmt.Sprintf(`
+		INSERT INTO %s (%s,%s,%s) 
+		VALUES ($1, $2, $3)
+		RETURNING %s`,
+		categoriesTableName,
+		// INTO
+		categoriesTableComponentsNon.name,
+		categoriesTableComponentsNon.description,
+		categoriesTableComponentsNon.link_name,
+		// RETURNING
+		categoriesTableComponentsNon.c_id,
+	)
+
+	err := q.db.QueryRow(q.ctx, query,
+		category.Name,
+		category.Description,
+		category.LinkName,
+	).Scan(&category.C_id)
+	if err != nil {
+		log.Println(err)
+		return domain.NewError().SetError(err)
+	}
+
+	return nil
+}
+
+func (q *categoriesDB) FindById(id int64) (*domain.Category, domain.Error) {
+	query := fmt.Sprintf(`
+		SELECT %s, %s, %s
+		FROM %s 
+		WHERE %s=$1`,
+		// SELECT
+		categoriesTableComponents.name,
+		categoriesTableComponents.description,
+		categoriesTableComponents.link_name,
+		// FROM
+		categoriesTableName,
+		// WHERE
+		categoriesTableComponents.c_id, // shtems
+	)
+
+	res := domain.Category{}
+
+	err := q.db.QueryRow(q.ctx, query,
+		id,
+	).Scan(
+		&res.Name,
+		&res.Description,
+		&res.LinkName,
+	)
+	if err != nil {
+		return nil, domain.NewError().SetError(err)
+	}
+
+	return &res, nil
+}
+
+// UPDATE!
+// UPDATE!
+// UPDATE!
+func (q *categoriesDB) Update(category *domain.Category) domain.Error {
+
+	query := fmt.Sprintf(`
+		UPDATE %s 
+		SET %s=$1, %s=$2, %s=$3 
+		WHERE %s=$4`,
+		categoriesTableName, // TABLE NAME
+		categoriesTableComponentsNon.name,
+		categoriesTableComponentsNon.description,
+		categoriesTableComponentsNon.link_name,
+		categoriesTableComponents.c_id, // for identifying the question to update
+	)
+	_, err := q.db.Exec(q.ctx, query,
+		category.Name,
+		category.Description,
+		category.LinkName,
+		category.C_id, // for identifying the question to update
+	)
+	if err != nil {
+		return domain.NewError().SetError(err)
+	}
+	return nil
+}
+
+// DELETE!
+// DELETE!
+// DELETE!
+func (q *categoriesDB) Delete(id int64) domain.Error {
+	// DELETE!
+	query := fmt.Sprintf(`
+		DELETE FROM %s 
+		WHERE %s=$1`,
+		categoriesTableName,
+		categoriesTableComponents.c_id,
+	)
+	_, err := q.db.Exec(q.ctx, query,
+		id,
+	)
+	if err != nil {
+		return domain.NewError().SetError(err)
+	}
+
+	return nil
 }
 
 func (q *categoriesDB) GetCategories() ([]*domain.Category, domain.Error) {

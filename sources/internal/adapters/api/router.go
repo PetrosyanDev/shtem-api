@@ -79,10 +79,10 @@ func NewAPIRouter(
 	{
 		categories := admin.Group("/categories")
 
-		categories.POST("/create", adminShtemsHandler.Create())
-		categories.POST("/:id", adminShtemsHandler.FindById())
-		categories.POST("/:id/update", adminShtemsHandler.Update())
-		categories.DELETE("/:id/delete", adminShtemsHandler.Delete())
+		categories.POST("/create", adminCategoriesHandler.Create())
+		categories.POST("/:id", adminCategoriesHandler.FindById())
+		categories.POST("/:id/update", adminCategoriesHandler.Update())
+		categories.DELETE("/:id/delete", adminCategoriesHandler.Delete())
 	}
 
 	r.NoRoute(func(ctx *gin.Context) { dto.WriteErrorResponse(ctx, domain.ErrRequestPath) })
