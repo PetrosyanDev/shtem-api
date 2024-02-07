@@ -5,13 +5,14 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	postgresclient "shtem-api/sources/internal/clients/postgres"
 	"shtem-api/sources/internal/core/domain"
 )
 
 var shtemsTableName = "shtems"
 
-var shtemsTableComponents = struct {
+type shtemsTable struct {
 	id          string
 	name        string
 	description string
@@ -20,7 +21,10 @@ var shtemsTableComponents = struct {
 	image       string
 	pdf         string
 	category    string
-}{
+	keywords    string
+}
+
+var shtemsTableComponents = shtemsTable{
 	id:          shtemsTableName + ".id",
 	name:        shtemsTableName + ".name",
 	description: shtemsTableName + ".description",
@@ -28,12 +32,120 @@ var shtemsTableComponents = struct {
 	link_name:   shtemsTableName + ".link_name",
 	image:       shtemsTableName + ".image",
 	pdf:         shtemsTableName + ".pdf",
+	keywords:    shtemsTableName + ".keywords",
 	category:    shtemsTableName + ".category",
+}
+var shtemsTableComponentsNon = shtemsTable{
+	id:          "id",
+	name:        "name",
+	description: "description",
+	author:      "author",
+	link_name:   "link_name",
+	image:       "image",
+	pdf:         "pdf",
+	keywords:    "keywords",
+	category:    "category",
 }
 
 type shtemsDB struct {
 	ctx context.Context
 	db  *postgresclient.PostgresDB
+}
+
+func (q *shtemsDB) Create(shtemaran *domain.Shtemaran) domain.Error {
+
+	query := fmt.Sprintf(`
+		INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s,%s) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+		RETURNING %s`,
+		shtemsTableName,
+		// INTO
+		shtemsTableComponentsNon.name,
+		shtemsTableComponentsNon.description,
+		shtemsTableComponentsNon.author,
+		shtemsTableComponentsNon.link_name,
+		shtemsTableComponentsNon.image,
+		shtemsTableComponentsNon.pdf,
+		shtemsTableComponentsNon.keywords,
+		shtemsTableComponentsNon.category,
+		// RETURNING
+		shtemsTableComponentsNon.id,
+	)
+
+	err := q.db.QueryRow(q.ctx, query,
+		shtemaran.Name,
+		shtemaran.Description,
+		shtemaran.Author,
+		shtemaran.LinkName,
+		shtemaran.Image,
+		shtemaran.PDF,
+		shtemaran.Keywords,
+		shtemaran.Category,
+	).Scan(&shtemaran.Id)
+	if err != nil {
+		log.Println(err)
+		return domain.NewError().SetError(err)
+	}
+
+	return nil
+}
+
+// UPDATE!
+// UPDATE!
+// UPDATE!
+func (q *shtemsDB) Update(shtemaran *domain.Shtemaran) domain.Error {
+
+	query := fmt.Sprintf(`
+		UPDATE %s 
+		SET %s=$1, %s=$2, %s=$3, %s=$4, %s=$5, %s=$6, %s=$7, %s=$8 
+		WHERE %s=$9`,
+		shtemsTableName, // TABLE NAME
+		shtemsTableComponentsNon.name,
+		shtemsTableComponentsNon.description,
+		shtemsTableComponentsNon.author,
+		shtemsTableComponentsNon.link_name,
+		shtemsTableComponentsNon.image,
+		shtemsTableComponentsNon.pdf,
+		shtemsTableComponentsNon.keywords,
+		shtemsTableComponentsNon.category,
+		shtemsTableComponents.id, // for identifying the question to update
+	)
+	_, err := q.db.Exec(q.ctx, query,
+		shtemaran.Name,
+		shtemaran.Description,
+		shtemaran.Author,
+		shtemaran.LinkName,
+		shtemaran.Image,
+		shtemaran.PDF,
+		shtemaran.Keywords,
+		shtemaran.Category,
+		shtemaran.Id, // for identifying the question to update
+	)
+	if err != nil {
+		return domain.NewError().SetError(err)
+	}
+	return nil
+}
+
+// DELETE!
+// DELETE!
+// DELETE!
+func (q *shtemsDB) Delete(id int64) domain.Error {
+	// DELETE!
+	query := fmt.Sprintf(`
+		DELETE FROM %s 
+		WHERE %s=$1`,
+		shtemsTableName,
+		shtemsTableComponents.id,
+	)
+	_, err := q.db.Exec(q.ctx, query,
+		id,
+	)
+	if err != nil {
+		return domain.NewError().SetError(err)
+	}
+
+	return nil
 }
 
 func (q *shtemsDB) GetShtemByLinkName(name string) (*domain.Shtemaran, domain.Error) {
