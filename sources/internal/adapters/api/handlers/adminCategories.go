@@ -77,6 +77,8 @@ func (h *adminCategoriesHandler) FindById() gin.HandlerFunc {
 			return
 		}
 
+		final_c.C_id = int64(id)
+
 		resp := new(dto.CategoryResponse)
 		resp.FromDomain(final_c)
 		dto.WriteResponse(ctx, resp)
@@ -85,10 +87,85 @@ func (h *adminCategoriesHandler) FindById() gin.HandlerFunc {
 
 func (h *adminCategoriesHandler) Update() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		// Bind Request
+		req := new(dto.UpdateCategoryRequest)
+		if err := ctx.BindJSON(req); err != nil {
+			log.Printf("adminShtemHandler:Update (%v)", err)
+			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
+			return
+		}
+
+		// GET ID ADD TO QUESTION
+		shtemID := ctx.Param("id")
+		if shtemID == "" {
+			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
+			return
+		}
+		id, _ := strconv.Atoi(shtemID)
+
+		// CHECK IF SHTEM EXISTS
+		ct, err := h.categoriesService.FindById(int64(id))
+		if err != nil {
+			log.Printf("adminShtemHandler:Update2 (%v)", err.RawError())
+			dto.WriteErrorResponse(ctx, domain.NewError().SetMessage("DOESNT EXIST"))
+			return
+		}
+
+		// Convert to shtem
+		category := new(domain.Category)
+		if err := req.ToDomain(category, ct); err != nil {
+			log.Printf("adminShtemHandler:Update1 (%s)", err.GetMessage())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		category.C_id = int64(id)
+
+		// UPDATE SHTEM
+		if err := h.categoriesService.Update(category); err != nil {
+			log.Printf("adminShtemHandler:Update3 (%v)", err.RawError())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		resp := new(dto.CategoryResponse)
+		resp.FromDomain(category)
+		dto.WriteResponse(ctx, resp)
 	}
 }
+
 func (h *adminCategoriesHandler) Delete() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		// GET ID
+		shtemID := ctx.Param("id")
+		if shtemID == "" {
+			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
+			return
+		}
+
+		id, _ := strconv.Atoi(shtemID)
+
+		// FIND SHTEM
+		categ, err := h.categoriesService.FindById(int64(id))
+		if err != nil {
+			log.Printf("adminShtemHandler:Delete (%v)", err.RawError())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		// DELETE SHTEM
+		err = h.categoriesService.Delete(int64(id))
+		if err != nil {
+			log.Printf("adminShtemHandler:Delete (%v)", err.RawError())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		categ.C_id = int64(id)
+
+		resp := new(dto.CategoryResponse)
+		resp.FromDomain(categ)
+		dto.WriteResponse(ctx, resp)
 	}
 }
 
