@@ -195,7 +195,6 @@ func (h *adminShtemsHandler) Cover() gin.HandlerFunc {
 
 		// file, err := h.filesService.CreateFileFromBase64(int64(id), false, req.Data64)
 		// TODO
-		return
 	}
 }
 func (h *adminShtemsHandler) Delete() gin.HandlerFunc {
