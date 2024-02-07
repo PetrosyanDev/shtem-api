@@ -41,7 +41,8 @@ type AdminQuestionsHandler interface {
 
 type AdminShtemsHandler interface {
 	Create() gin.HandlerFunc
-	Find() gin.HandlerFunc
+	FindByLinkName() gin.HandlerFunc
+	FindById() gin.HandlerFunc
 	Update() gin.HandlerFunc
 	Cover() gin.HandlerFunc
 	Delete() gin.HandlerFunc
