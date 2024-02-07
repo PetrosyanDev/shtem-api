@@ -14,6 +14,7 @@ type QuestionsRepository interface {
 
 type ShtemsRepository interface {
 	Create(shtemaran *domain.Shtemaran) domain.Error
+	FindById(id int64) (*domain.Shtemaran, domain.Error)
 	Update(shtemaran *domain.Shtemaran) domain.Error
 	Delete(id int64) domain.Error
 

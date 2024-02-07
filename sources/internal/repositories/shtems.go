@@ -12,6 +12,9 @@ type shtemsRepository struct {
 func (p *shtemsRepository) Create(shtemaran *domain.Shtemaran) domain.Error {
 	return p.db.Create(shtemaran)
 }
+func (p *shtemsRepository) FindById(id int64) (*domain.Shtemaran, domain.Error) {
+	return p.db.FindById(id)
+}
 func (p *shtemsRepository) Update(shtemaran *domain.Shtemaran) domain.Error {
 	return p.db.Update(shtemaran)
 }
