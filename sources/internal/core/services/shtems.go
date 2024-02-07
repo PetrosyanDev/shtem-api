@@ -9,6 +9,15 @@ type shtemsService struct {
 	shtemsRepository repositories.ShtemsRepository
 }
 
+func (p *shtemsService) Create(shtemaran *domain.Shtemaran) domain.Error {
+	return p.shtemsRepository.Create(shtemaran)
+}
+func (p *shtemsService) Update(shtemaran *domain.Shtemaran) domain.Error {
+	return p.shtemsRepository.Update(shtemaran)
+}
+func (p *shtemsService) Delete(id int64) domain.Error {
+	return p.shtemsRepository.Delete(id)
+}
 func (q *shtemsService) GetShtems() ([]*domain.Shtemaran, domain.Error) {
 	return q.shtemsRepository.GetShtems()
 }
