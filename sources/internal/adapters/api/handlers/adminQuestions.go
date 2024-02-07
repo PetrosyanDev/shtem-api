@@ -57,7 +57,7 @@ func (h *adminQuestionHandler) Create() gin.HandlerFunc {
 		dto.WriteResponse(ctx, resp, http.StatusCreated)
 	}
 }
-func (h *adminQuestionHandler) Get() gin.HandlerFunc {
+func (h *adminQuestionHandler) Find() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// Bind Request
 		req := new(dto.FindQuestionRequest)

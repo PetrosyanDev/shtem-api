@@ -32,9 +32,17 @@ type AdminHandler interface {
 
 type AdminQuestionsHandler interface {
 	Create() gin.HandlerFunc
-	Get() gin.HandlerFunc
+	Find() gin.HandlerFunc
 	Update() gin.HandlerFunc
 	Delete() gin.HandlerFunc
 
 	FindBajin() gin.HandlerFunc
+}
+
+type AdminShtemsHandler interface {
+	Create() gin.HandlerFunc
+	Find() gin.HandlerFunc
+	Update() gin.HandlerFunc
+	Cover() gin.HandlerFunc
+	Delete() gin.HandlerFunc
 }

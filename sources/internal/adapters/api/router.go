@@ -17,6 +17,7 @@ func NewAPIRouter(
 	apiHandler ports.APIHandler,
 	adminHandler ports.AdminHandler,
 	adminQuestionHandler ports.AdminQuestionsHandler,
+	adminShtemsHandler ports.AdminShtemsHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -58,11 +59,20 @@ func NewAPIRouter(
 		questions := admin.Group("/questions")
 
 		questions.POST("/create", adminQuestionHandler.Create())
-		questions.POST("/:id", adminQuestionHandler.Get())
+		questions.POST("/:id", adminQuestionHandler.Find())
 		questions.POST("/:id/update", adminQuestionHandler.Update())
 		questions.DELETE("/:id/delete", adminQuestionHandler.Delete())
 
 		questions.POST("/find-bajin", adminQuestionHandler.FindBajin())
+	}
+	{
+		shtems := admin.Group("/shtems")
+
+		shtems.POST("/create", adminShtemsHandler.Create())
+		shtems.POST("/:id", adminShtemsHandler.Find())
+		shtems.POST("/:id/update", adminShtemsHandler.Update())
+		shtems.POST("/:id/cover/upload", adminShtemsHandler.Cover())
+		shtems.DELETE("/:id/delete", adminShtemsHandler.Delete())
 	}
 
 	r.NoRoute(func(ctx *gin.Context) { dto.WriteErrorResponse(ctx, domain.ErrRequestPath) })
