@@ -77,7 +77,7 @@ deploy-prd-unbuild:
 	ssh ${PRD_HOST} -p ${SSH_PORT} "mkdir -p ${DEPLOY_DIR}/docker"
 	scp -P ${SSH_PORT} -r docker/run.yml ${PRD_HOST}:${PRD_BASE}/${DEPLOY_DIR}/docker/
 	scp -P ${SSH_PORT} secrets/prd.json ${PRD_HOST}:${PRD_BASE}/${DEPLOY_DIR}/secrets.json
-#	ssh ${DEV_HOST} -p ${SSH_PORT} "docker service rm erik_${DEPLOY_DIR}"
+	ssh ${DEV_HOST} -p ${SSH_PORT} "docker service rm erik_${DEPLOY_DIR}"
 	ssh ${PRD_HOST} -p ${SSH_PORT} "IMG=${IMAGE} TAG=${RELEASE_VERSION} DIR=${PRD_BASE}/${DEPLOY_DIR} MODE=release docker stack deploy -c ${DEPLOY_DIR}/docker/run.yml erik --with-registry-auth"
 	ssh ${PRD_HOST} -p ${SSH_PORT} "rm -f ${DEPLOY_DIR}/secrets.json"
 	@echo "DEPLOYED on PRODUCTION! VERSION is: ${RELEASE_VERSION}"
