@@ -24,6 +24,9 @@ func (q *adminService) Update(adm *domain.Admin) domain.Error {
 func (q *adminService) Delete(id int64) domain.Error {
 	return q.adminRepository.Delete(id)
 }
+func (q *adminService) PasswordMatches(usr domain.Admin, plainText string) (bool, domain.Error) {
+	return q.adminRepository.PasswordMatches(usr, plainText)
+}
 func (q *adminService) GetByUsername(username string) (*domain.Admin, domain.Error) {
 	return q.adminRepository.GetByUsername(username)
 }

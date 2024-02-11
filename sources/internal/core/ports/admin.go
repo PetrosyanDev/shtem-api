@@ -13,6 +13,8 @@ type AdminService interface {
 	Update(adm *domain.Admin) domain.Error
 	Delete(id int64) domain.Error
 
+	PasswordMatches(usr domain.Admin, plainText string) (bool, domain.Error)
+
 	GetByUsername(username string) (*domain.Admin, domain.Error)
 	GetAdmins() (*[]*domain.Admin, domain.Error)
 }
