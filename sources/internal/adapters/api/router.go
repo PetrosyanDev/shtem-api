@@ -47,7 +47,7 @@ func NewAPIRouter(
 	admin.Use(adminHandler.AuthenticateToken())
 	{
 		// admin.GET("/check", adminHandler.Check())
-		admin.GET("/logout", adminHandler.Logout())
+		admin.DELETE("/logout", adminHandler.Logout())
 	}
 	{
 		admins := admin.Group("/admins")

@@ -96,13 +96,17 @@ func (h *adminHandler) Logout() gin.HandlerFunc {
 				return
 			}
 
-			err = h.adminTokenService.DeleteToken(t.Id)
+			err = h.adminTokenService.Delete(t.Id)
 			if err != nil {
-				log.Printf("adminHandler:validateToken3 (%s)", err.GetMessage())
+				log.Printf("adminHandler:logout (%s)", err.GetMessage())
 				dto.WriteErrorResponse(ctx, domain.ErrAccessDenied)
 				ctx.Abort()
 				return
 			}
+		} else {
+			dto.WriteErrorResponse(ctx, domain.ErrNoRows)
+			ctx.Abort()
+			return
 		}
 	}
 }
