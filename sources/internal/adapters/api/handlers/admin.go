@@ -20,8 +20,6 @@ type adminHandler struct {
 	adminService      ports.AdminService
 }
 
-const cookieMaxAge = 1 * 60 * 60 // 1 hour
-
 func (h *adminHandler) Check() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
@@ -267,7 +265,7 @@ func (h *adminHandler) AuthenticateToken() gin.HandlerFunc {
 		}
 
 		headerParts := strings.Split(authorizationHeader, " ")
-		if len(headerParts) < 2 || headerParts[0] != "Bearer" {
+		if len(headerParts) < 2 && headerParts[0] != "Bearer" {
 			dto.WriteErrorResponse(ctx, domain.NewError().SetMessage("No valid authorization header."))
 			ctx.Abort()
 			return
