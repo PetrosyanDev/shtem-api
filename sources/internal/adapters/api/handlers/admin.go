@@ -265,11 +265,13 @@ func (h *adminHandler) AuthenticateToken() gin.HandlerFunc {
 		}
 
 		headerParts := strings.Split(authorizationHeader, " ")
-		if len(headerParts) < 2 && headerParts[0] != "Bearer" {
+		if len(headerParts) != 2 && headerParts[0] != "Bearer" {
 			dto.WriteErrorResponse(ctx, domain.NewError().SetMessage("No valid authorization header."))
 			ctx.Abort()
 			return
 		}
+
+		log.Println(headerParts)
 
 		token := headerParts[1]
 
