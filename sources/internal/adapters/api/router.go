@@ -44,7 +44,7 @@ func NewAPIRouter(
 	// ADMIN
 	admin := apiV1.Group("/admin")
 	// SECURITY
-	admin.Use(adminHandler.ValidateToken())
+	admin.Use(adminHandler.AuthenticateToken())
 	{
 		admin.GET("/check", adminHandler.Check())
 	}

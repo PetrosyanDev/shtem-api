@@ -216,8 +216,9 @@ func (h *adminShtemsHandler) Delete() gin.HandlerFunc {
 			return
 		}
 
+		log.Println(id, shtem)
 		// DELETE SHTEM
-		err = h.questionsService.Delete(int64(id))
+		err = h.shtemsService.Delete(int64(id))
 		if err != nil {
 			log.Printf("adminShtemHandler:Delete (%v)", err.RawError())
 			dto.WriteErrorResponse(ctx, err)
