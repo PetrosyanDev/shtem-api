@@ -16,6 +16,9 @@ func (q *adminService) Create(username, password string) (*domain.Admin, domain.
 func (q *adminService) GetByToken(token string) (*domain.Admin, domain.Error) {
 	return q.adminRepository.GetByToken(token)
 }
+func (q *adminService) GetById(id int64) (*domain.Admin, domain.Error) {
+	return q.adminRepository.GetById(id)
+}
 
 func (q *adminService) Update(adm *domain.Admin) domain.Error {
 	return q.adminRepository.Update(adm)

@@ -158,6 +158,7 @@ func (h *adminHandler) Create() gin.HandlerFunc {
 }
 func (h *adminHandler) Update() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+
 		// Bind Request
 		req := new(dto.AdminUpdateRequest)
 		if err := ctx.BindJSON(&req); err != nil {
@@ -174,8 +175,17 @@ func (h *adminHandler) Update() gin.HandlerFunc {
 			return
 		}
 
+		// GET ID
+		userID := ctx.Param("id")
+		if userID == "" {
+			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
+			return
+		}
+
+		id, _ := strconv.Atoi(userID)
+
 		// Find User
-		admin, err := h.adminService.GetByUsername(adm.Username)
+		admin, err := h.adminService.GetById(int64(id))
 		if err != nil {
 			log.Printf("adminHandler:Create2 (%s)", err.GetMessage())
 			dto.WriteErrorResponse(ctx, err)

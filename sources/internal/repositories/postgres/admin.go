@@ -76,6 +76,41 @@ func (a *adminDB) Create(username, password string) (*domain.Admin, domain.Error
 	return &adm, nil
 }
 
+func (q *adminDB) GetById(id int64) (*domain.Admin, domain.Error) {
+	query := fmt.Sprintf(`
+		SELECT %s, %s, %s, %s, %s
+		FROM %s 
+		WHERE %s=$1`,
+		// SELECT
+		adminTableComponents.id,
+		adminTableComponents.username,
+		adminTableComponents.password,
+		adminTableComponents.createdAt,
+		adminTableComponents.updatedAt,
+		// FROM
+		adminTableName,
+		// WHERE
+		adminTableComponents.id, // shtems
+	)
+
+	res := domain.Admin{}
+
+	err := q.db.QueryRow(q.ctx, query,
+		id,
+	).Scan(
+		&res.ID,
+		&res.Username,
+		&res.Password,
+		&res.CreatedAt,
+		&res.UpdatedAt,
+	)
+	if err != nil {
+		return nil, domain.NewError().SetError(err)
+	}
+
+	return &res, nil
+}
+
 // GET
 // GET
 // GET
@@ -125,6 +160,13 @@ func (q *adminDB) Update(adm *domain.Admin) domain.Error {
 
 	adm.UpdatedAt = time.Now()
 
+	hashedPass, err := bcrypt.GenerateFromPassword([]byte(adm.Password), PassCost)
+	if err != nil {
+		return domain.NewError().SetError(err)
+	}
+
+	adm.Password = string(hashedPass)
+
 	query := fmt.Sprintf(`
 		UPDATE %s 
 		SET %s=$1, %s=$2, %s=$3
@@ -135,7 +177,7 @@ func (q *adminDB) Update(adm *domain.Admin) domain.Error {
 		adminTableComponentsNon.password,
 		adminTableComponents.id, // for identifying the question to update
 	)
-	_, err := q.db.Exec(q.ctx, query,
+	_, err = q.db.Exec(q.ctx, query,
 		adm.UpdatedAt,
 		adm.Username,
 		adm.Password,

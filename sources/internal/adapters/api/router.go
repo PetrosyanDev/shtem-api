@@ -54,7 +54,7 @@ func NewAPIRouter(
 
 		admins.POST("/create", adminHandler.Create())
 		admins.POST("/get", adminHandler.GetUsers())
-		admins.POST("/update", adminHandler.Update())
+		admins.POST("/:id/update", adminHandler.Update())
 		admins.DELETE("/:id/delete", adminHandler.Delete())
 	}
 	{
