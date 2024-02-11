@@ -9,6 +9,7 @@ import (
 	"shtem-api/sources/internal/core/domain"
 	"shtem-api/sources/internal/core/ports"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,28 +21,6 @@ type adminHandler struct {
 }
 
 const cookieMaxAge = 1 * 60 * 60 // 1 hour
-
-func (h *adminHandler) GenerateToken() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-
-		// u, err := h.adminService.Create("Erik", "pass")
-		// if err != nil {
-		// 	log.Printf("adminHandler:generateToken (%s)", err.GetMessage())
-		// 	dto.WriteErrorResponse(ctx, err)
-		// 	return
-		// }
-
-		t, err := h.adminTokenService.GenerateToken(1)
-		if err != nil {
-			log.Printf("adminHandler:generateToken (%s)", err.GetMessage())
-			dto.WriteErrorResponse(ctx, err)
-			return
-		}
-
-		ctx.SetCookie("session", t.Token, cookieMaxAge, "/", h.cfg.API.Addr, false, true)
-		dto.WriteResponse(ctx, fmt.Sprintf("Cookie %s has been set", t.Token), http.StatusCreated)
-	}
-}
 
 func (h *adminHandler) Check() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -104,6 +83,15 @@ func (h *adminHandler) Login() gin.HandlerFunc {
 			dto.WriteErrorResponse(ctx, domain.ErrAccessDenied)
 			return
 		}
+
+		t, err := h.adminTokenService.GenerateToken(admin.ID)
+		if err != nil {
+			log.Println(err)
+			dto.WriteErrorResponse(ctx, domain.NewError().SetMessage("Server Side Issue"))
+			return
+		}
+
+		admin.Token = *t
 
 		// Responce
 		resp := new(dto.AdminResponse)
@@ -230,8 +218,6 @@ func (h *adminHandler) GetUsers() gin.HandlerFunc {
 			return
 		}
 
-		log.Println(admins)
-
 		// Responce
 		resp := new(dto.AdminsResponse)
 		resp.SliceFromDomain(*admins)
@@ -268,6 +254,42 @@ func (h *adminHandler) ValidateToken() gin.HandlerFunc {
 				return
 			}
 		}
+	}
+}
+
+func (h *adminHandler) AuthenticateToken() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		authorizationHeader := ctx.Request.Header.Get("Authorization")
+		if authorizationHeader == "" {
+			dto.WriteErrorResponse(ctx, domain.NewError().SetMessage("No authorization header."))
+			ctx.Abort()
+			return
+		}
+
+		headerParts := strings.Split(authorizationHeader, " ")
+		if len(headerParts) < 2 || headerParts[0] != "Bearer" {
+			dto.WriteErrorResponse(ctx, domain.NewError().SetMessage("No valid authorization header."))
+			ctx.Abort()
+			return
+		}
+
+		token := headerParts[1]
+
+		t, err := h.adminTokenService.GetToken(token)
+		if err != nil {
+			dto.WriteErrorResponse(ctx, domain.ErrAccessDenied)
+			ctx.Abort()
+			return
+		}
+
+		_, err = h.adminTokenService.UpdateToken(t)
+		if err != nil {
+			log.Printf("adminHandler:validateToken3 (%s)", err.GetMessage())
+			dto.WriteErrorResponse(ctx, domain.ErrAccessDenied)
+			ctx.Abort()
+			return
+		}
+
 	}
 }
 

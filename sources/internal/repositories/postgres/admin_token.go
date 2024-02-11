@@ -56,8 +56,6 @@ func (a *adminTokenDB) GenerateToken(id int64) (*domain.AdminToken, domain.Error
 	t.CreatedAt = time.Now()
 	t.Expiry = time.Now().Add(1 * time.Hour)
 
-	log.Println(t)
-
 	query := fmt.Sprintf(`
 		INSERT INTO %s (%s,%s,%s,%s) 
 		VALUES ($1, $2, $3, $4)`,

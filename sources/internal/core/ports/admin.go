@@ -20,8 +20,8 @@ type AdminService interface {
 }
 
 type AdminHandler interface {
-	GenerateToken() gin.HandlerFunc
 	ValidateToken() gin.HandlerFunc
+	AuthenticateToken() gin.HandlerFunc
 
 	Check() gin.HandlerFunc
 	Login() gin.HandlerFunc

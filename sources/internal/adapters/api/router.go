@@ -36,10 +36,10 @@ func NewAPIRouter(
 		posts.POST("/findBajin", apiHandler.FindBajin())
 
 		// LOGIN
-		apiV1.POST("/login", adminHandler.Login())
 	}
 
 	// OTHER
+	apiV1.POST("/login", adminHandler.Login())
 
 	// ADMIN
 	admin := apiV1.Group("/admin")
