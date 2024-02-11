@@ -2,14 +2,19 @@ package postgresrepository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	postgresclient "shtem-api/sources/internal/clients/postgres"
 	"shtem-api/sources/internal/core/domain"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 var adminTableName = "admin"
+
+const PassCost = 12
 
 type adminTable struct {
 	id        string
@@ -46,7 +51,12 @@ func (a *adminDB) Create(username, password string) (*domain.Admin, domain.Error
 
 	adm := domain.Admin{}
 	adm.Username = username
-	adm.Password = password
+	hashedPass, err := bcrypt.GenerateFromPassword([]byte(password), PassCost)
+	if err != nil {
+		return nil, domain.NewError().SetError(err)
+	}
+
+	adm.Password = string(hashedPass)
 
 	query := fmt.Sprintf(`
 	INSERT INTO %s (%s, %s) 
@@ -58,9 +68,8 @@ func (a *adminDB) Create(username, password string) (*domain.Admin, domain.Error
 		adminTableComponentsNon.id,
 	)
 
-	err := a.db.QueryRow(a.ctx, query, adm.Username, adm.Password).Scan(&adm.ID)
+	err = a.db.QueryRow(a.ctx, query, adm.Username, adm.Password).Scan(&adm.ID)
 	if err != nil {
-		log.Println(err)
 		return nil, domain.NewError().SetError(err)
 	}
 
@@ -251,6 +260,20 @@ func (a *adminDB) GetAdmins() (*[]*domain.Admin, domain.Error) {
 	}
 
 	return &users, nil
+}
+
+func (a *adminDB) PasswordMatches(usr domain.Admin, plainText string) (bool, domain.Error) {
+	err := bcrypt.CompareHashAndPassword([]byte(usr.Password), []byte(plainText))
+	if err != nil {
+		switch {
+		case errors.Is(err, bcrypt.ErrMismatchedHashAndPassword):
+			return false, nil
+		default:
+			return false, domain.NewError().SetError(err)
+		}
+	}
+
+	return true, nil
 }
 
 func NewAdminDB(ctx context.Context, db *postgresclient.PostgresDB) *adminDB {
