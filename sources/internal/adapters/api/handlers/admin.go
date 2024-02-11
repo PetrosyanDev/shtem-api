@@ -103,6 +103,8 @@ func (h *adminHandler) Logout() gin.HandlerFunc {
 				ctx.Abort()
 				return
 			}
+
+			dto.WriteResponse(ctx, t, http.StatusCreated)
 		} else {
 			dto.WriteErrorResponse(ctx, domain.ErrNoRows)
 			ctx.Abort()
