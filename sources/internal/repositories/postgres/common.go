@@ -53,4 +53,5 @@ type AdminTokenDB interface {
 	GenerateToken(id int64) (*domain.AdminToken, domain.Error)
 	GetToken(token string) (*domain.AdminToken, domain.Error)
 	UpdateToken(t *domain.AdminToken) (*domain.AdminToken, domain.Error)
+	Delete(id int64) domain.Error
 }

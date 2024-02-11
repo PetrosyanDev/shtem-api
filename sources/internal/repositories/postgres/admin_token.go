@@ -164,6 +164,26 @@ func (a *adminTokenDB) UpdateToken(t *domain.AdminToken) (*domain.AdminToken, do
 	return t, nil
 }
 
+// DELETE!
+// DELETE!
+// DELETE!
+func (q *adminTokenDB) Delete(id int64) domain.Error {
+	// DELETE!
+	query_token := fmt.Sprintf(`
+		DELETE FROM %s
+		WHERE %s=$1`,
+		adminTokenTableName,
+		adminTokenTableComponents.id,
+	)
+	_, err := q.db.Exec(q.ctx, query_token,
+		id,
+	)
+	if err != nil {
+		return domain.NewError().SetError(err)
+	}
+	return nil
+}
+
 func NewAdminTokenDB(ctx context.Context, db *postgresclient.PostgresDB) *adminTokenDB {
 	return &adminTokenDB{ctx, db}
 }
