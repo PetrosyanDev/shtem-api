@@ -24,6 +24,9 @@ func (p *adminRepository) Update(adm *domain.Admin) domain.Error {
 func (p *adminRepository) Delete(id int64) domain.Error {
 	return p.db.Delete(id)
 }
+func (p *adminRepository) PasswordMatches(usr domain.Admin, plainText string) (bool, domain.Error) {
+	return p.db.PasswordMatches(usr, plainText)
+}
 
 func (p *adminRepository) GetByUsername(username string) (*domain.Admin, domain.Error) {
 	return p.db.GetByUsername(username)
