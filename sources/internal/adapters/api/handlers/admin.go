@@ -99,7 +99,8 @@ func (h *adminHandler) Login() gin.HandlerFunc {
 		}
 
 		// Check
-		if admin.Password != adm.Password {
+		if ok, err := h.adminService.PasswordMatches(*admin, adm.Password); !ok {
+			log.Println(err)
 			dto.WriteErrorResponse(ctx, domain.ErrAccessDenied)
 			return
 		}
