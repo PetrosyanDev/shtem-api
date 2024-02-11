@@ -20,7 +20,7 @@ func (q *adminService) GetById(id int64) (*domain.Admin, domain.Error) {
 	return q.adminRepository.GetById(id)
 }
 
-func (q *adminService) Update(adm *domain.Admin) domain.Error {
+func (q *adminService) Update(adm *domain.Admin) (*domain.Admin, domain.Error) {
 	return q.adminRepository.Update(adm)
 }
 

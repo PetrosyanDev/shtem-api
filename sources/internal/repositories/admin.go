@@ -20,7 +20,7 @@ func (p *adminRepository) GetById(id int64) (*domain.Admin, domain.Error) {
 	return p.db.GetById(id)
 }
 
-func (p *adminRepository) Update(adm *domain.Admin) domain.Error {
+func (p *adminRepository) Update(adm *domain.Admin) (*domain.Admin, domain.Error) {
 	return p.db.Update(adm)
 }
 

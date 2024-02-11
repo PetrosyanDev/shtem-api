@@ -156,13 +156,13 @@ func (a *adminDB) GetByToken(token string) (*domain.Admin, domain.Error) {
 // UPDATE!
 // UPDATE!
 // UPDATE!
-func (q *adminDB) Update(adm *domain.Admin) domain.Error {
+func (q *adminDB) Update(adm *domain.Admin) (*domain.Admin, domain.Error) {
 
 	adm.UpdatedAt = time.Now()
 
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(adm.Password), PassCost)
 	if err != nil {
-		return domain.NewError().SetError(err)
+		return nil, domain.NewError().SetError(err)
 	}
 
 	adm.Password = string(hashedPass)
@@ -184,9 +184,9 @@ func (q *adminDB) Update(adm *domain.Admin) domain.Error {
 		adm.ID,
 	)
 	if err != nil {
-		return domain.NewError().SetError(err)
+		return nil, domain.NewError().SetError(err)
 	}
-	return nil
+	return adm, nil
 }
 
 // DELETE!

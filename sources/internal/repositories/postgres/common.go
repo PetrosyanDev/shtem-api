@@ -41,7 +41,7 @@ type AdminDB interface {
 	Create(username, password string) (*domain.Admin, domain.Error)
 	GetByToken(token string) (*domain.Admin, domain.Error)
 	GetById(id int64) (*domain.Admin, domain.Error)
-	Update(adm *domain.Admin) domain.Error
+	Update(adm *domain.Admin) (*domain.Admin, domain.Error)
 	Delete(id int64) domain.Error
 
 	PasswordMatches(usr domain.Admin, plainText string) (bool, domain.Error)

@@ -192,10 +192,11 @@ func (h *adminHandler) Update() gin.HandlerFunc {
 			return
 		}
 
+		admin.Username = adm.Username
 		admin.Password = adm.Password
 
 		// Update User
-		err = h.adminService.Update(admin)
+		final_a, err := h.adminService.Update(admin)
 		if err != nil {
 			log.Printf("adminHandler:Create4 (%s)", err.GetMessage())
 			dto.WriteErrorResponse(ctx, err)
@@ -204,7 +205,7 @@ func (h *adminHandler) Update() gin.HandlerFunc {
 
 		// Responce
 		resp := new(dto.AdminResponse)
-		resp.FromDomain(admin)
+		resp.FromDomain(final_a)
 		dto.WriteResponse(ctx, resp, http.StatusCreated)
 	}
 }
