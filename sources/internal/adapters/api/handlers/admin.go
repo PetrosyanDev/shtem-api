@@ -82,14 +82,8 @@ func (h *adminHandler) Logout() gin.HandlerFunc {
 		}
 
 		if req.Token != "7ff7b78c-166b-48f4-a3b6-29764345e6b6" {
-			t, err := h.adminTokenService.GetToken(req.Token)
-			if err != nil {
-				dto.WriteErrorResponse(ctx, domain.ErrAccessDenied)
-				ctx.Abort()
-				return
-			}
 
-			err = h.adminTokenService.Delete(t.Id)
+			err := h.adminTokenService.DeleteByToken(req.Token)
 			if err != nil {
 				log.Printf("adminHandler:logout (%s)", err.GetMessage())
 				dto.WriteErrorResponse(ctx, domain.ErrAccessDenied)
@@ -97,9 +91,10 @@ func (h *adminHandler) Logout() gin.HandlerFunc {
 				return
 			}
 
-			dto.WriteResponse(ctx, t, http.StatusCreated)
+			dto.WriteResponse(ctx, "Logged out", http.StatusCreated)
+
 		} else {
-			dto.WriteErrorResponse(ctx, domain.ErrNoRows)
+			dto.WriteErrorResponse(ctx, domain.NewError().SetMessage("Cannot remove this token"))
 			ctx.Abort()
 			return
 		}
