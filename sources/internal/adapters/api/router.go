@@ -73,6 +73,7 @@ func NewAPIRouter(
 	{
 		categories := admin.Group("/categories")
 
+		categories.POST("/all", adminCategoriesHandler.All())
 		categories.POST("/create", adminCategoriesHandler.Create())
 		categories.POST("/:id", adminCategoriesHandler.FindById())
 		categories.POST("/:id/update", adminCategoriesHandler.Update())

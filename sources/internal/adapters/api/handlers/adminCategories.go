@@ -19,6 +19,23 @@ type adminCategoriesHandler struct {
 	adminService      ports.AdminService
 }
 
+func (h *adminCategoriesHandler) All() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+		// GET Categories
+		categories, err := h.categoriesService.GetCategories()
+		if err != nil {
+			log.Printf("adminShtemHandler:Get2 (%v)", err.RawError())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		resp := new(dto.CategoriesResponse)
+		resp.SliceFromDomain(categories)
+		dto.WriteResponse(ctx, resp)
+	}
+}
+
 func (h *adminCategoriesHandler) Create() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// Bind Request

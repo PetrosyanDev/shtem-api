@@ -90,9 +90,9 @@ type CategoryResponse struct {
 	Response[CategoryResponceData]
 }
 
-// type CategoriesResponce struct {
-// 	Response[[]CategoryResponceData]
-// }
+type CategoriesResponse struct {
+	Response[[]CategoryResponceData]
+}
 
 func (r *CategoryResponse) FromDomain(p *domain.Category) domain.Error {
 	r.Data = new(CategoryResponceData)
@@ -102,4 +102,21 @@ func (r *CategoryResponse) FromDomain(p *domain.Category) domain.Error {
 	r.Data.LinkName = p.LinkName
 
 	return nil
+}
+
+func (r *CategoriesResponse) SliceFromDomain(p []*domain.Category) {
+	// Initialize r.Data as a pointer to a slice
+	r.Data = new([]CategoryResponceData)
+
+	// Initialize the underlying slice
+	*r.Data = make([]CategoryResponceData, len(p))
+
+	for index, q := range p {
+		(*r.Data)[index] = CategoryResponceData{
+			C_id:        q.C_id,
+			Name:        q.Name,
+			Description: q.Description,
+			LinkName:    q.LinkName,
+		}
+	}
 }

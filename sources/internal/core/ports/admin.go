@@ -51,6 +51,8 @@ type AdminShtemsHandler interface {
 }
 
 type AdminCategoriesHandler interface {
+	All() gin.HandlerFunc
+
 	Create() gin.HandlerFunc
 	FindById() gin.HandlerFunc
 	Update() gin.HandlerFunc
