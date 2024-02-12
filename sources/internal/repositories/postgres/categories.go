@@ -340,7 +340,7 @@ func (q *categoriesDB) GetShtemsByCategoryLinkName(c_linkName string) ([]*domain
 	var result []*domain.Shtemaran
 
 	query := fmt.Sprintf(`
-		SELECT %s, %s, %s, %s, %s, %s
+		SELECT %s, %s, %s, %s, %s, %s, %s, %s
 		FROM %s
 		JOIN %s
 		ON %s = %s
@@ -351,6 +351,8 @@ func (q *categoriesDB) GetShtemsByCategoryLinkName(c_linkName string) ([]*domain
 		shtemsTableComponents.author,
 		shtemsTableComponents.link_name,
 		shtemsTableComponents.image,
+		shtemsTableComponents.pdf,
+		shtemsTableComponents.keywords,
 		// FROM TABLE NAME
 		shtemsTableName,
 		// JOIN TABLE NAME
@@ -370,7 +372,8 @@ func (q *categoriesDB) GetShtemsByCategoryLinkName(c_linkName string) ([]*domain
 
 	for rows.Next() {
 		var id int64
-		var name, description, author, linkName, image sql.NullString
+		var name, description, author, linkName, image, pdf sql.NullString
+		var keywords []string
 
 		if err := rows.Scan(
 			&id,
@@ -379,6 +382,8 @@ func (q *categoriesDB) GetShtemsByCategoryLinkName(c_linkName string) ([]*domain
 			&author,
 			&linkName,
 			&image,
+			&pdf,
+			&keywords,
 		); err != nil {
 			return nil, domain.NewError().SetError(err)
 		}
@@ -390,6 +395,8 @@ func (q *categoriesDB) GetShtemsByCategoryLinkName(c_linkName string) ([]*domain
 			Author:      author.String,
 			LinkName:    linkName.String,
 			Image:       image.String,
+			PDF:         pdf.String,
+			Keywords:    keywords,
 		}
 
 		result = append(result, s)
