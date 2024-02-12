@@ -76,7 +76,7 @@ func (h *adminHandler) Logout() gin.HandlerFunc {
 		// Bind Request
 		req := new(dto.AdminLogoutRequest)
 		if err := ctx.BindJSON(&req); err != nil {
-			log.Printf("adminHandler:Create (%v)", err)
+			log.Printf("adminHandler:logout1 (%v)", err)
 			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
 			return
 		}
@@ -85,7 +85,7 @@ func (h *adminHandler) Logout() gin.HandlerFunc {
 
 			err := h.adminTokenService.DeleteByToken(req.Token)
 			if err != nil {
-				log.Printf("adminHandler:logout (%s)", err.GetMessage())
+				log.Printf("adminHandler:logout2 (%s)", err.GetMessage())
 				dto.WriteErrorResponse(ctx, domain.ErrAccessDenied)
 				ctx.Abort()
 				return

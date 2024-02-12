@@ -37,15 +37,12 @@ func NewAPIRouter(
 
 	// OTHER
 	apiV1.POST("/login", adminHandler.Login())
+	apiV1.DELETE("/logout", adminHandler.Logout())
 
 	// ADMIN
 	admin := apiV1.Group("/admin")
 	// SECURITY
 	admin.Use(adminHandler.AuthenticateToken())
-	{
-		// admin.GET("/check", adminHandler.Check())
-		admin.DELETE("/logout", adminHandler.Logout())
-	}
 	{
 		admins := admin.Group("/admins")
 
