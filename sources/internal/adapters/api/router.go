@@ -31,11 +31,8 @@ func NewAPIRouter(
 		posts.POST("/create", apiHandler.Create())
 		posts.POST("/:id/update", apiHandler.Update())
 		posts.DELETE("/:id/delete", apiHandler.Delete())
-
 		posts.POST("/getShtems", apiHandler.GetShtems())
 		posts.POST("/findBajin", apiHandler.FindBajin())
-
-		// LOGIN
 	}
 
 	// OTHER
@@ -64,7 +61,6 @@ func NewAPIRouter(
 		questions.POST("/:id", adminQuestionHandler.Find())
 		questions.POST("/:id/update", adminQuestionHandler.Update())
 		questions.DELETE("/:id/delete", adminQuestionHandler.Delete())
-
 		questions.POST("/find-bajin", adminQuestionHandler.FindBajin())
 	}
 	{
