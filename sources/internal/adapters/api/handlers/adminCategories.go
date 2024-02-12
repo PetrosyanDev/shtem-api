@@ -102,6 +102,37 @@ func (h *adminCategoriesHandler) FindById() gin.HandlerFunc {
 	}
 }
 
+func (h *adminCategoriesHandler) GetShtems() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		// Bind Request
+		req := new(dto.GetCategoryShtemsRequest)
+		if err := ctx.BindJSON(&req); err != nil {
+			log.Printf("adminShtemHandler:Create (%v)", err)
+			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
+			return
+		}
+
+		// FIND SHTEM
+		c, err := h.categoriesService.FindById(int64(req.Id))
+		if err != nil {
+			log.Printf("adminShtemHandler:GetShtems1 (%v)", err.RawError())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		shtems, err := h.categoriesService.GetShtemsByCategoryLinkName(c.LinkName)
+		if err != nil {
+			log.Printf("adminCategoryHandler:GetShtems2 (%v)", err.RawError())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		resp := new(dto.FullShtemsResponce)
+		resp.SliceFromDomain(shtems)
+		dto.WriteResponse(ctx, resp)
+	}
+}
+
 func (h *adminCategoriesHandler) Update() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// Bind Request

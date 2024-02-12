@@ -43,6 +43,10 @@ func (r *FindCategoryRequest) ToDomain(p *domain.Category) domain.Error {
 	return nil
 }
 
+type GetCategoryShtemsRequest struct {
+	Id int64 `json:"id" binding:"required"`
+}
+
 // UPDATE
 type UpdateCategoryRequest struct {
 	Name        string `json:"name"`

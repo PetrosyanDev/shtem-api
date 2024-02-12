@@ -155,6 +155,9 @@ type ShtemResponse struct {
 type ShtemsResponce struct {
 	Response[[]string]
 }
+type FullShtemsResponce struct {
+	Response[[]ShtemResponceData]
+}
 
 func (r *ShtemResponse) FromDomain(p *domain.Shtemaran) domain.Error {
 	r.Data = new(ShtemResponceData)
@@ -169,4 +172,26 @@ func (r *ShtemResponse) FromDomain(p *domain.Shtemaran) domain.Error {
 	r.Data.Category = p.Category
 
 	return nil
+}
+
+func (r *FullShtemsResponce) SliceFromDomain(p []*domain.Shtemaran) {
+	// Initialize r.Data as a pointer to a slice
+	r.Data = new([]ShtemResponceData)
+
+	// Initialize the underlying slice
+	*r.Data = make([]ShtemResponceData, len(p))
+
+	for index, q := range p {
+		(*r.Data)[index] = ShtemResponceData{
+			Id:          q.Id,
+			Name:        q.Name,
+			Description: q.Description,
+			Author:      q.Author,
+			LinkName:    q.LinkName,
+			Image:       q.Image,
+			PDF:         q.PDF,
+			Keywords:    q.Keywords,
+			Category:    q.Category,
+		}
+	}
 }
