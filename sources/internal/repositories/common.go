@@ -55,4 +55,5 @@ type AdminTokenRepository interface {
 	GetToken(token string) (*domain.AdminToken, domain.Error)
 	UpdateToken(t *domain.AdminToken) (*domain.AdminToken, domain.Error)
 	Delete(id int64) domain.Error
+	DeleteByToken(token string) domain.Error
 }

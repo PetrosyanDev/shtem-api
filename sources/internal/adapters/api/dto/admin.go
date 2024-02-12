@@ -25,6 +25,11 @@ func (r *AdminLoginRequest) ToDomain(p *domain.Admin) domain.Error {
 	return nil
 }
 
+// Logout
+type AdminLogoutRequest struct {
+	Token string `json:"token" binding:"required"`
+}
+
 // CREATE
 type AdminCreateRequest struct {
 	Username string `json:"username" binding:"required"`

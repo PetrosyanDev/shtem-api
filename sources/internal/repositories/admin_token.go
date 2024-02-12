@@ -21,6 +21,9 @@ func (p *adminTokenRepository) UpdateToken(t *domain.AdminToken) (*domain.AdminT
 func (p *adminTokenRepository) Delete(id int64) domain.Error {
 	return p.db.Delete(id)
 }
+func (p *adminTokenRepository) DeleteByToken(token string) domain.Error {
+	return p.db.DeleteByToken(token)
+}
 
 func NewAdminTokenRepository(db postgresrepository.AdminTokenDB) *adminTokenRepository {
 	return &adminTokenRepository{db}

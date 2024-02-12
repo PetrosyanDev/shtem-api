@@ -72,24 +72,17 @@ func (h *adminHandler) Login() gin.HandlerFunc {
 
 func (h *adminHandler) Logout() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		authorizationHeader := ctx.Request.Header.Get("Authorization")
-		if authorizationHeader == "" {
-			dto.WriteErrorResponse(ctx, domain.NewError().SetMessage("No authorization header."))
-			ctx.Abort()
+
+		// Bind Request
+		req := new(dto.AdminLogoutRequest)
+		if err := ctx.BindJSON(&req); err != nil {
+			log.Printf("adminHandler:Create (%v)", err)
+			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
 			return
 		}
 
-		headerParts := strings.Split(authorizationHeader, " ")
-		if len(headerParts) != 2 || headerParts[0] != "Bearer" {
-			dto.WriteErrorResponse(ctx, domain.NewError().SetMessage("No valid authorization header."))
-			ctx.Abort()
-			return
-		}
-
-		token := headerParts[1]
-
-		if token != "7ff7b78c-166b-48f4-a3b6-29764345e6b6" {
-			t, err := h.adminTokenService.GetToken(token)
+		if req.Token != "7ff7b78c-166b-48f4-a3b6-29764345e6b6" {
+			t, err := h.adminTokenService.GetToken(req.Token)
 			if err != nil {
 				dto.WriteErrorResponse(ctx, domain.ErrAccessDenied)
 				ctx.Abort()

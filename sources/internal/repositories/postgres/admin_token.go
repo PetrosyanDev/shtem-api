@@ -183,6 +183,22 @@ func (q *adminTokenDB) Delete(id int64) domain.Error {
 	}
 	return nil
 }
+func (q *adminTokenDB) DeleteByToken(token string) domain.Error {
+	// DELETE!
+	query_token := fmt.Sprintf(`
+		DELETE FROM %s
+		WHERE %s=$1`,
+		adminTokenTableName,
+		adminTokenTableComponents.token,
+	)
+	_, err := q.db.Exec(q.ctx, query_token,
+		token,
+	)
+	if err != nil {
+		return domain.NewError().SetError(err)
+	}
+	return nil
+}
 
 func NewAdminTokenDB(ctx context.Context, db *postgresclient.PostgresDB) *adminTokenDB {
 	return &adminTokenDB{ctx, db}

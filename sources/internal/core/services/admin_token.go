@@ -21,6 +21,9 @@ func (q *adminTokenService) UpdateToken(t *domain.AdminToken) (*domain.AdminToke
 func (q *adminTokenService) Delete(id int64) domain.Error {
 	return q.adminTokenRepository.Delete(id)
 }
+func (q *adminTokenService) DeleteByToken(token string) domain.Error {
+	return q.adminTokenRepository.DeleteByToken(token)
+}
 
 func NewAdminTokenService(adminTokenRepository repositories.AdminTokenRepository) *adminTokenService {
 	return &adminTokenService{adminTokenRepository}
