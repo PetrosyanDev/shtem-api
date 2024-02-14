@@ -271,11 +271,12 @@ func (q *questionsDB) FindAllByShtem(shtemId int64) ([]*domain.Question, domain.
 
 	// FIND!
 	query := fmt.Sprintf(`
-		SELECT %s, %s, %s, %s, %s, %s, %s 
+		SELECT %s, %s, %s, %s, %s, %s, %s, %s 
 		FROM %s 
 		WHERE %s=$1
 		ORDER BY %s, %s`,
 		// SELECT
+		questionsTableComponents.q_id,
 		questionsTableComponents.bajin,
 		questionsTableComponents.mas,
 		questionsTableComponents.q_number,
@@ -307,6 +308,7 @@ func (q *questionsDB) FindAllByShtem(shtemId int64) ([]*domain.Question, domain.
 		var result domain.Question
 		// Scan the row data into the result struct
 		if err := rows.Scan(
+			&result.Q_id,
 			&result.Bajin,
 			&result.Mas,
 			&result.Q_number,
