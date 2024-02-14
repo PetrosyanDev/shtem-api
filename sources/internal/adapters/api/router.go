@@ -58,6 +58,8 @@ func NewAPIRouter(
 		questions.POST("/:id", adminQuestionHandler.Find())
 		questions.POST("/:id/update", adminQuestionHandler.Update())
 		questions.DELETE("/:id/delete", adminQuestionHandler.Delete())
+
+		questions.POST("/all", adminQuestionHandler.All())
 		questions.POST("/find-bajin", adminQuestionHandler.FindBajin())
 	}
 	{

@@ -118,6 +118,10 @@ func (r *FindQuestionRequest) ToDomain(p *domain.Question, s ports.ShtemsService
 	return nil
 }
 
+type FindShtemQuestionsRequest struct {
+	ShtemId int64 `json:"shtemaran" binding:"required"`
+}
+
 // GLOBAL
 // GLOBAL
 // GLOBAL
