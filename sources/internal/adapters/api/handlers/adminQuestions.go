@@ -133,6 +133,8 @@ func (h *adminQuestionHandler) Update() gin.HandlerFunc {
 			return
 		}
 
+		question.Q_id = int64(id)
+
 		// UPDATE QUESTION
 		if err := h.questionsService.Update(question); err != nil {
 			log.Printf("adminQuestionHandler:Update3 (%v)", err.RawError())
