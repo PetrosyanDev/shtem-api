@@ -172,7 +172,7 @@ func (r *BajinResponse) SliceFromDomain(p []*domain.Question) {
 			Text:    q.Text,
 			Options: q.Options,
 			Answers: q.Answers,
-			ShtemId: q.Q_id,
+			ShtemId: q.ShtemId,
 		}
 	}
 }

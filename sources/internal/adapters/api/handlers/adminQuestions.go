@@ -134,7 +134,7 @@ func (h *adminQuestionHandler) Update() gin.HandlerFunc {
 		}
 
 		// UPDATE QUESTION
-		if err := h.questionsService.Update(question); err != nil {
+		if err := h.questionsService.Update(q); err != nil {
 			log.Printf("adminQuestionHandler:Update3 (%v)", err.RawError())
 			dto.WriteErrorResponse(ctx, err)
 			return
