@@ -32,6 +32,10 @@ func (q *questionsService) FindBajin(question *domain.Question) ([]*domain.Quest
 	return q.questionsRepository.FindBajin(question)
 }
 
+func (q *questionsService) FindAllByShtem(shtemId int64) ([]*domain.Question, domain.Error) {
+	return q.questionsRepository.FindAllByShtem(shtemId)
+}
+
 func (q *questionsService) FindByID(id int64) (*domain.Question, domain.Error) {
 	return q.questionsRepository.FindByID(id)
 }
