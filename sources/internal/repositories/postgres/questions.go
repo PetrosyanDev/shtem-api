@@ -267,6 +267,63 @@ func (q *questionsDB) FindBajin(question *domain.Question) ([]*domain.Question, 
 	return outputQuestions, nil
 }
 
+func (q *questionsDB) FindAllByShtem(shtemId int64) ([]*domain.Question, domain.Error) {
+
+	// FIND!
+	query := fmt.Sprintf(`
+		SELECT %s, %s, %s, %s, %s, %s, %s 
+		FROM %s 
+		WHERE %s=$1
+		ORDER BY %s, %s`,
+		// SELECT
+		questionsTableComponents.bajin,
+		questionsTableComponents.mas,
+		questionsTableComponents.q_number,
+		questionsTableComponents.text,
+		questionsTableComponents.options,
+		questionsTableComponents.answers,
+		questionsTableComponents.shtem_id,
+		// FROM
+		questionsTableName,
+		// WHERE
+		questionsTableComponents.shtem_id,
+		// ORDER BY
+		questionsTableComponents.mas,
+		questionsTableComponents.q_number,
+	)
+	rows, err := q.db.Query(q.ctx, query,
+		shtemId,
+	)
+	if err == pgx.ErrNoRows {
+		return nil, domain.ErrNoRows
+	} else if err != nil {
+		return nil, domain.NewError().SetError(err)
+	}
+	defer rows.Close()
+
+	var outputQuestions []*domain.Question
+
+	for rows.Next() {
+		var result domain.Question
+		// Scan the row data into the result struct
+		if err := rows.Scan(
+			&result.Bajin,
+			&result.Mas,
+			&result.Q_number,
+			&result.Text,
+			&result.Options,
+			&result.Answers,
+			&result.ShtemId,
+		); err != nil {
+			return nil, domain.ErrBadRequest
+		}
+
+		outputQuestions = append(outputQuestions, &result)
+	}
+
+	return outputQuestions, nil
+}
+
 // FINDBYID!
 // FINDBYID!
 // FINDBYID!
