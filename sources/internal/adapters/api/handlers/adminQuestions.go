@@ -209,6 +209,29 @@ func (h *adminQuestionHandler) FindBajin() gin.HandlerFunc {
 		dto.WriteResponse(ctx, resp)
 	}
 }
+func (h *adminQuestionHandler) All() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		// Bind Request
+		req := new(dto.FindShtemQuestionsRequest)
+		if err := ctx.BindJSON(req); err != nil {
+			log.Printf("apiHandler:FindAll (%v)", err)
+			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
+			return
+		}
+
+		// FIND QUESTION
+		questions, err := h.questionsService.FindAllByShtem(req.ShtemId)
+		if err != nil {
+			log.Printf("apiHandler:FindAll (%v)", err.RawError())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		resp := new(dto.BajinResponse)
+		resp.SliceFromDomain(questions)
+		dto.WriteResponse(ctx, resp)
+	}
+}
 
 func NewAdminQuestionHandler(
 	cfg *configs.Configs,

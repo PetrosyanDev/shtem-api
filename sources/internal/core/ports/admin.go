@@ -38,6 +38,7 @@ type AdminQuestionsHandler interface {
 	Update() gin.HandlerFunc
 	Delete() gin.HandlerFunc
 
+	All() gin.HandlerFunc
 	FindBajin() gin.HandlerFunc
 }
 
