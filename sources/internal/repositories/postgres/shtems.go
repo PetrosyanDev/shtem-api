@@ -22,6 +22,8 @@ type shtemsTable struct {
 	pdf         string
 	category    string
 	keywords    string
+	has_quiz    string
+	has_pdf     string
 }
 
 var shtemsTableComponents = shtemsTable{
@@ -34,6 +36,8 @@ var shtemsTableComponents = shtemsTable{
 	pdf:         shtemsTableName + ".pdf",
 	keywords:    shtemsTableName + ".keywords",
 	category:    shtemsTableName + ".category",
+	has_quiz:    shtemsTableName + ".has_quiz",
+	has_pdf:     shtemsTableName + ".has_pdf",
 }
 var shtemsTableComponentsNon = shtemsTable{
 	id:          "id",
@@ -45,6 +49,8 @@ var shtemsTableComponentsNon = shtemsTable{
 	pdf:         "pdf",
 	keywords:    "keywords",
 	category:    "category",
+	has_quiz:    "has_quiz",
+	has_pdf:     "has_pdf",
 }
 
 type shtemsDB struct {
@@ -55,8 +61,8 @@ type shtemsDB struct {
 func (q *shtemsDB) Create(shtemaran *domain.Shtemaran) domain.Error {
 
 	query := fmt.Sprintf(`
-		INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s,%s) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+		INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 		RETURNING %s`,
 		shtemsTableName,
 		// INTO
@@ -68,6 +74,8 @@ func (q *shtemsDB) Create(shtemaran *domain.Shtemaran) domain.Error {
 		shtemsTableComponentsNon.pdf,
 		shtemsTableComponentsNon.keywords,
 		shtemsTableComponentsNon.category,
+		shtemsTableComponentsNon.has_quiz,
+		shtemsTableComponentsNon.has_pdf,
 		// RETURNING
 		shtemsTableComponentsNon.id,
 	)
@@ -81,6 +89,8 @@ func (q *shtemsDB) Create(shtemaran *domain.Shtemaran) domain.Error {
 		shtemaran.PDF,
 		shtemaran.Keywords,
 		shtemaran.Category,
+		shtemaran.HasQuiz,
+		shtemaran.HasPDF,
 	).Scan(&shtemaran.Id)
 	if err != nil {
 		log.Println(err)
@@ -96,7 +106,7 @@ func (q *shtemsDB) Create(shtemaran *domain.Shtemaran) domain.Error {
 func (q *shtemsDB) FindById(id int64) (*domain.Shtemaran, domain.Error) {
 
 	query := fmt.Sprintf(`
-		SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s
+		SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
 		FROM %s 
 		WHERE %s=$1`,
 		// SELECT
@@ -109,6 +119,8 @@ func (q *shtemsDB) FindById(id int64) (*domain.Shtemaran, domain.Error) {
 		shtemsTableComponents.pdf,
 		shtemsTableComponents.keywords,
 		shtemsTableComponents.category,
+		shtemsTableComponents.has_quiz,
+		shtemsTableComponents.has_pdf,
 		// FROM
 		shtemsTableName,
 		// WHERE
@@ -129,6 +141,8 @@ func (q *shtemsDB) FindById(id int64) (*domain.Shtemaran, domain.Error) {
 		&res.PDF,
 		&res.Keywords,
 		&res.Category,
+		&res.HasQuiz,
+		&res.HasPDF,
 	)
 	if err != nil {
 		return nil, domain.NewError().SetError(err)
@@ -144,8 +158,8 @@ func (q *shtemsDB) Update(shtemaran *domain.Shtemaran) domain.Error {
 
 	query := fmt.Sprintf(`
 		UPDATE %s 
-		SET %s=$1, %s=$2, %s=$3, %s=$4, %s=$5, %s=$6, %s=$7, %s=$8 
-		WHERE %s=$9`,
+		SET %s=$1, %s=$2, %s=$3, %s=$4, %s=$5, %s=$6, %s=$7, %s=$8, %s=$9, %s=$10
+		WHERE %s=$11`,
 		shtemsTableName, // TABLE NAME
 		shtemsTableComponentsNon.name,
 		shtemsTableComponentsNon.description,
@@ -155,6 +169,8 @@ func (q *shtemsDB) Update(shtemaran *domain.Shtemaran) domain.Error {
 		shtemsTableComponentsNon.pdf,
 		shtemsTableComponentsNon.keywords,
 		shtemsTableComponentsNon.category,
+		shtemsTableComponentsNon.has_quiz,
+		shtemsTableComponentsNon.has_pdf,
 		shtemsTableComponents.id, // for identifying the question to update
 	)
 	_, err := q.db.Exec(q.ctx, query,
@@ -166,6 +182,8 @@ func (q *shtemsDB) Update(shtemaran *domain.Shtemaran) domain.Error {
 		shtemaran.PDF,
 		shtemaran.Keywords,
 		shtemaran.Category,
+		shtemaran.HasQuiz,
+		shtemaran.HasPDF,
 		shtemaran.Id, // for identifying the question to update
 	)
 	if err != nil {
@@ -200,7 +218,7 @@ func (q *shtemsDB) GetShtemByLinkName(name string) (*domain.Shtemaran, domain.Er
 	var result *domain.Shtemaran
 
 	query := fmt.Sprintf(`
-		SELECT %s, %s, %s, %s, %s, %s, %s 
+		SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
 		FROM %s 
 		WHERE %s=$1
 		LIMIT 1`,
@@ -211,6 +229,10 @@ func (q *shtemsDB) GetShtemByLinkName(name string) (*domain.Shtemaran, domain.Er
 		shtemsTableComponents.link_name,
 		shtemsTableComponents.image,
 		shtemsTableComponents.pdf,
+		shtemsTableComponents.keywords,
+		shtemsTableComponents.category,
+		shtemsTableComponents.has_quiz,
+		shtemsTableComponents.has_pdf,
 		shtemsTableName,                 // TABLE NAME
 		shtemsTableComponents.link_name, // LINK NAME
 	)
@@ -222,8 +244,10 @@ func (q *shtemsDB) GetShtemByLinkName(name string) (*domain.Shtemaran, domain.Er
 	defer rows.Close()
 
 	if rows.Next() {
-		var id int64
+		var id, category int64
 		var name, description, author, linkName, image, pdf sql.NullString
+		var keywords []string
+		var has_quiz, has_pdf bool
 
 		if err := rows.Scan(
 			&id,
@@ -233,6 +257,10 @@ func (q *shtemsDB) GetShtemByLinkName(name string) (*domain.Shtemaran, domain.Er
 			&linkName,
 			&image,
 			&pdf,
+			&keywords,
+			&category,
+			&has_quiz,
+			&has_pdf,
 		); err != nil {
 			return nil, domain.NewError().SetError(err)
 		}
@@ -245,6 +273,10 @@ func (q *shtemsDB) GetShtemByLinkName(name string) (*domain.Shtemaran, domain.Er
 			LinkName:    linkName.String,
 			Image:       image.String,
 			PDF:         pdf.String,
+			Keywords:    keywords,
+			Category:    category,
+			HasQuiz:     has_quiz,
+			HasPDF:      has_pdf,
 		}
 	}
 
@@ -256,14 +288,19 @@ func (q *shtemsDB) GetShtems() ([]*domain.Shtemaran, domain.Error) {
 
 	// FIND DISTINCT SHTEMARAN NAMES
 	query := fmt.Sprintf(`
-		SELECT %s, %s, %s, %s, %s, %s 
+		SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s 
 		FROM %s`,
+		shtemsTableComponents.id,
 		shtemsTableComponents.name,
 		shtemsTableComponents.description,
 		shtemsTableComponents.author,
 		shtemsTableComponents.link_name,
 		shtemsTableComponents.image,
 		shtemsTableComponents.pdf,
+		shtemsTableComponents.keywords,
+		shtemsTableComponents.category,
+		shtemsTableComponents.has_quiz,
+		shtemsTableComponents.has_pdf,
 		shtemsTableName, // TABLE NAME
 	)
 
@@ -274,26 +311,39 @@ func (q *shtemsDB) GetShtems() ([]*domain.Shtemaran, domain.Error) {
 	defer rows.Close()
 
 	for rows.Next() {
+		var id, category int64
 		var name, description, author, linkName, image, pdf sql.NullString
+		var keywords []string
+		var has_quiz, has_pdf bool
 
 		if err := rows.Scan(
+			&id,
 			&name,
-			&author,
 			&description,
+			&author,
 			&linkName,
 			&image,
 			&pdf,
+			&keywords,
+			&category,
+			&has_quiz,
+			&has_pdf,
 		); err != nil {
 			return nil, domain.NewError().SetError(err)
 		}
 
 		shtemarans = append(shtemarans, &domain.Shtemaran{
+			Id:          id,
 			Name:        name.String,
 			Description: description.String,
 			Author:      author.String,
 			LinkName:    linkName.String,
 			Image:       image.String,
 			PDF:         pdf.String,
+			Keywords:    keywords,
+			Category:    category,
+			HasQuiz:     has_quiz,
+			HasPDF:      has_pdf,
 		})
 	}
 
@@ -345,15 +395,21 @@ func (q *shtemsDB) GetShtemsByCategoryId(c_id int64) ([]*domain.Shtemaran, domai
 
 	// FIND DISTINCT SHTEMARAN NAMES
 	query := fmt.Sprintf(`
-		SELECT %s, %s, %s, %s, %s
+		SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
 		FROM %s
 		JOIN %s
 		ON %s = $1`,
+		shtemsTableComponents.id,
 		shtemsTableComponents.name,
 		shtemsTableComponents.description,
 		shtemsTableComponents.author,
 		shtemsTableComponents.link_name,
 		shtemsTableComponents.image,
+		shtemsTableComponents.pdf,
+		shtemsTableComponents.keywords,
+		shtemsTableComponents.category,
+		shtemsTableComponents.has_quiz,
+		shtemsTableComponents.has_pdf,
 		shtemsTableName,                // TABLE NAME
 		categoriesTableName,            // JOIN TABLE NAME
 		shtemsTableComponents.category, // MATCH
@@ -366,24 +422,39 @@ func (q *shtemsDB) GetShtemsByCategoryId(c_id int64) ([]*domain.Shtemaran, domai
 	defer rows.Close()
 
 	for rows.Next() {
-		var name, description, author, linkName, image sql.NullString
+		var id, category int64
+		var name, description, author, linkName, image, pdf sql.NullString
+		var keywords []string
+		var has_quiz, has_pdf bool
 
 		if err := rows.Scan(
+			&id,
 			&name,
-			&author,
 			&description,
+			&author,
 			&linkName,
 			&image,
+			&pdf,
+			&keywords,
+			&category,
+			&has_quiz,
+			&has_pdf,
 		); err != nil {
 			return nil, domain.NewError().SetError(err)
 		}
 
 		shtemarans = append(shtemarans, &domain.Shtemaran{
+			Id:          id,
 			Name:        name.String,
-			Author:      author.String,
 			Description: description.String,
+			Author:      author.String,
 			LinkName:    linkName.String,
 			Image:       image.String,
+			PDF:         pdf.String,
+			Keywords:    keywords,
+			Category:    category,
+			HasQuiz:     has_quiz,
+			HasPDF:      has_pdf,
 		})
 	}
 
