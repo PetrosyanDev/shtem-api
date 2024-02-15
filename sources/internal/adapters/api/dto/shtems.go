@@ -14,6 +14,8 @@ type CreateShtemRequest struct {
 	PDF         string   `json:"pdf"`
 	Keywords    []string `json:"keywords"`
 	Category    int64    `json:"category" binding:"required"`
+	HasQuiz     bool     `json:"has_quiz"`
+	HasPDF      bool     `json:"has_pdf"`
 }
 
 type CreateShtemResponce struct {
@@ -26,6 +28,8 @@ type CreateShtemResponce struct {
 	PDF         string   `json:"pdf"`
 	Keywords    []string `json:"keywords"`
 	Category    int64    `json:"category"`
+	HasQuiz     bool     `json:"has_quiz"`
+	HasPDF      bool     `json:"has_pdf"`
 }
 
 func (r *CreateShtemRequest) ToDomain(p *domain.Shtemaran) domain.Error {
@@ -37,6 +41,8 @@ func (r *CreateShtemRequest) ToDomain(p *domain.Shtemaran) domain.Error {
 	p.PDF = r.PDF
 	p.Keywords = r.Keywords
 	p.Category = r.Category
+	p.HasQuiz = r.HasQuiz
+	p.HasPDF = r.HasPDF
 
 	return nil
 }
@@ -56,6 +62,8 @@ type FindShtemResponce struct {
 	PDF         string   `json:"pdf"`
 	Keywords    []string `json:"keywords"`
 	Category    int64    `json:"category"`
+	HasQuiz     bool     `json:"has_quiz"`
+	HasPDF      bool     `json:"has_pdf"`
 }
 
 func (r *FindShtemRequest) ToDomain(p *domain.Shtemaran) domain.Error {
@@ -75,6 +83,8 @@ type UpdateShtemRequest struct {
 	PDF         string   `json:"pdf"`
 	Keywords    []string `json:"keywords"`
 	Category    int64    `json:"category"`
+	HasQuiz     bool     `json:"has_quiz"`
+	HasPDF      bool     `json:"has_pdf"`
 }
 
 type UpdateShtemResponce struct {
@@ -87,6 +97,8 @@ type UpdateShtemResponce struct {
 	PDF         string   `json:"pdf"`
 	Keywords    []string `json:"keywords"`
 	Category    int64    `json:"category" binding:"required"`
+	HasQuiz     bool     `json:"has_quiz"`
+	HasPDF      bool     `json:"has_pdf"`
 }
 
 func (r *UpdateShtemRequest) ToDomain(p *domain.Shtemaran, shtemaran *domain.Shtemaran) domain.Error {
@@ -98,6 +110,8 @@ func (r *UpdateShtemRequest) ToDomain(p *domain.Shtemaran, shtemaran *domain.Sht
 	p.PDF = r.PDF
 	p.Keywords = r.Keywords
 	p.Category = r.Category
+	p.HasQuiz = r.HasQuiz
+	p.HasPDF = r.HasPDF
 
 	if p.Name == "" {
 		p.Name = shtemaran.Name
@@ -146,6 +160,8 @@ type ShtemResponceData struct {
 	PDF         string   `json:"pdf"`
 	Keywords    []string `json:"keywords"`
 	Category    int64    `json:"category" binding:"required"`
+	HasQuiz     bool     `json:"has_quiz"`
+	HasPDF      bool     `json:"has_pdf"`
 }
 
 type ShtemResponse struct {
@@ -170,6 +186,8 @@ func (r *ShtemResponse) FromDomain(p *domain.Shtemaran) domain.Error {
 	r.Data.PDF = p.PDF
 	r.Data.Keywords = p.Keywords
 	r.Data.Category = p.Category
+	r.Data.HasQuiz = p.HasQuiz
+	r.Data.HasPDF = p.HasPDF
 
 	return nil
 }
@@ -192,6 +210,8 @@ func (r *FullShtemsResponce) SliceFromDomain(p []*domain.Shtemaran) {
 			PDF:         q.PDF,
 			Keywords:    q.Keywords,
 			Category:    q.Category,
+			HasQuiz:     q.HasQuiz,
+			HasPDF:      q.HasPDF,
 		}
 	}
 }
