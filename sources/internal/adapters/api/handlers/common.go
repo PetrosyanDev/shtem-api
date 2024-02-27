@@ -208,6 +208,33 @@ func (h *apiHandler) GetShtems() gin.HandlerFunc {
 	}
 }
 
+func (h *apiHandler) GetShtemBajins() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		// GET ID
+		shtemLink := ctx.Param("shtem")
+		if shtemLink == "" {
+			dto.WriteErrorResponse(ctx, domain.ErrBadRequest)
+			return
+		}
+
+		bajins, err := h.shtemsService.GetShtemBajinsByLinkName(shtemLink)
+		if err != nil {
+			log.Printf("apiHandler:GetBajins (%v)", err.RawError())
+			dto.WriteErrorResponse(ctx, err)
+			return
+		}
+
+		if len(bajins) == 0 {
+			dto.WriteErrorResponse(ctx, domain.NewError().SetMessage("NO ROWS FOUND"))
+			return
+		}
+
+		resp := new(dto.FullShtemBajinResponse)
+		resp.SliceFromDomain(bajins)
+		dto.WriteResponse(ctx, resp)
+	}
+}
+
 func NewAPIHandler(
 	cfg *configs.Configs,
 	questionsService ports.QuestionsService,

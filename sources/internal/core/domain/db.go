@@ -26,8 +26,11 @@ type Shtemaran struct {
 }
 
 type ShtemBajin struct {
-	Name   string
-	Number int
+	Id      int64
+	ShtemId int64
+	Name    string
+	Number  int
+	IsReady bool
 }
 
 type Category struct {
