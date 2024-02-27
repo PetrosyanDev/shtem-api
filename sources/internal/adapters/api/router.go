@@ -27,13 +27,14 @@ func NewAPIRouter(
 	apiV1 := r.Group("/api/v1")
 	{
 		posts := apiV1.Group("/questions")
+		freeShtems := apiV1.Group("/shtems")
 
 		posts.POST("/create", apiHandler.Create())
 		posts.POST("/:id/update", apiHandler.Update())
 		posts.DELETE("/:id/delete", apiHandler.Delete())
 		posts.POST("/getShtems", apiHandler.GetShtems())
 		posts.POST("/findBajin", apiHandler.FindBajin())
-		posts.POST("/get-shtem-bajin/:shtem", apiHandler.GetShtemBajins())
+		freeShtems.POST("/get-shtem-bajin/:shtem", apiHandler.GetShtemBajins())
 	}
 
 	// OTHER
