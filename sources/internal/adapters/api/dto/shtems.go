@@ -150,6 +150,41 @@ type UploadCoverShtemRequest struct {
 // GLOBAL
 // GLOBAL
 
+type ShtemBajinsResponceData struct {
+	Id      int64  `json:"id" binding:"required"`
+	ShtemId int64  `json:"shtem_id" binding:"required"`
+	Name    string `json:"name" binding:"required"`
+	Number  int    `json:"number" binding:"required"`
+	IsReady bool   `json:"is_ready" binding:"required"`
+}
+
+type ShtemBajinResponse struct {
+	Response[ShtemBajinsResponceData]
+}
+type FullShtemBajinResponse struct {
+	Response[[]ShtemBajinsResponceData]
+}
+
+func (r *FullShtemBajinResponse) SliceFromDomain(p []*domain.ShtemBajin) {
+	// Initialize r.Data as a pointer to a slice
+	r.Data = new([]ShtemBajinsResponceData)
+
+	// Initialize the underlying slice
+	*r.Data = make([]ShtemBajinsResponceData, len(p))
+
+	for index, q := range p {
+		(*r.Data)[index] = ShtemBajinsResponceData{
+			Id:      q.Id,
+			ShtemId: q.ShtemId,
+			Name:    q.Name,
+			Number:  q.Number,
+			IsReady: q.IsReady,
+		}
+	}
+}
+
+// SHTEM
+
 type ShtemResponceData struct {
 	Id          int64    `json:"id" binding:"required"`
 	Name        string   `json:"name" binding:"required"`
@@ -167,7 +202,6 @@ type ShtemResponceData struct {
 type ShtemResponse struct {
 	Response[ShtemResponceData]
 }
-
 type ShtemsResponce struct {
 	Response[[]string]
 }

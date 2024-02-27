@@ -33,6 +33,7 @@ func NewAPIRouter(
 		posts.DELETE("/:id/delete", apiHandler.Delete())
 		posts.POST("/getShtems", apiHandler.GetShtems())
 		posts.POST("/findBajin", apiHandler.FindBajin())
+		posts.POST("/get-shtem-bajin/:shtem", apiHandler.GetShtemBajins())
 	}
 
 	// OTHER
