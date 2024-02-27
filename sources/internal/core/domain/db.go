@@ -25,6 +25,11 @@ type Shtemaran struct {
 	HasPDF      bool
 }
 
+type ShtemBajin struct {
+	Name   string
+	Number int
+}
+
 type Category struct {
 	C_id        int64
 	Name        string

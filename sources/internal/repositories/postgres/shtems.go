@@ -11,6 +11,7 @@ import (
 )
 
 var shtemsTableName = "shtems"
+var shtemBajinsTableName = "shtem_bajins"
 
 type shtemsTable struct {
 	id          string
@@ -24,6 +25,13 @@ type shtemsTable struct {
 	keywords    string
 	has_quiz    string
 	has_pdf     string
+}
+
+type shtemBajinsTable struct {
+	id       string
+	shtem_id string
+	name     string
+	number   string
 }
 
 var shtemsTableComponents = shtemsTable{
@@ -51,6 +59,13 @@ var shtemsTableComponentsNon = shtemsTable{
 	category:    "category",
 	has_quiz:    "has_quiz",
 	has_pdf:     "has_pdf",
+}
+
+var shtemBajinsTableComponents = shtemBajinsTable{
+	id:       shtemBajinsTableName + ".id",
+	shtem_id: shtemBajinsTableName + ".shtem_id",
+	name:     shtemBajinsTableName + ".name",
+	number:   shtemBajinsTableName + ".number",
 }
 
 type shtemsDB struct {
@@ -463,6 +478,28 @@ func (q *shtemsDB) GetShtemsByCategoryId(c_id int64) ([]*domain.Shtemaran, domai
 	}
 
 	return shtemarans, nil
+}
+
+func (q *shtemsDB) GetShtemBajinsByLinkName(link string) ([]*domain.ShtemBajin, domain.Error) {
+	query := fmt.Sprintf(`
+		SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+		FROM %s
+		JOIN %s
+		ON %s = $1 AND %s=%s`,
+		shtemBajinsTableComponents.id,
+		shtemBajinsTableComponents.shtem_id,
+		shtemBajinsTableComponents.name,
+		shtemBajinsTableComponents.number,
+		shtemBajinsTableName,                // TABLE NAME
+		shtemsTableName,                     // JOIN TABLE NAME
+		shtemsTableComponents.link_name,     // MATCH
+		shtemsTableComponents.id,            // MATCH
+		shtemBajinsTableComponents.shtem_id, // MATCH
+	)
+
+	log.Println(query)
+
+	return nil, nil
 }
 
 func NewShtemsDB(ctx context.Context, db *postgresclient.PostgresDB) *shtemsDB {

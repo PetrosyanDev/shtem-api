@@ -33,6 +33,9 @@ func (p *shtemsRepository) GetShtemLinkNames() ([]string, domain.Error) {
 func (p *shtemsRepository) GetShtemByLinkName(name string) (*domain.Shtemaran, domain.Error) {
 	return p.db.GetShtemByLinkName(name)
 }
+func (p *shtemsRepository) GetShtemBajinsByLinkName(link string) ([]*domain.ShtemBajin, domain.Error) {
+	return p.db.GetShtemBajinsByLinkName(link)
+}
 
 func NewShtemsRepository(db postgresrepository.ShtemsDB) *shtemsRepository {
 	return &shtemsRepository{db}
