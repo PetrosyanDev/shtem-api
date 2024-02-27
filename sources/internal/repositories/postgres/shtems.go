@@ -32,6 +32,7 @@ type shtemBajinsTable struct {
 	shtem_id string
 	name     string
 	number   string
+	is_ready string
 }
 
 var shtemsTableComponents = shtemsTable{
@@ -66,6 +67,7 @@ var shtemBajinsTableComponents = shtemBajinsTable{
 	shtem_id: shtemBajinsTableName + ".shtem_id",
 	name:     shtemBajinsTableName + ".name",
 	number:   shtemBajinsTableName + ".number",
+	is_ready: shtemBajinsTableName + ".is_ready",
 }
 
 type shtemsDB struct {
@@ -482,7 +484,7 @@ func (q *shtemsDB) GetShtemsByCategoryId(c_id int64) ([]*domain.Shtemaran, domai
 
 func (q *shtemsDB) GetShtemBajinsByLinkName(link string) ([]*domain.ShtemBajin, domain.Error) {
 	query := fmt.Sprintf(`
-		SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+		SELECT %s, %s, %s, %s, %s
 		FROM %s
 		JOIN %s
 		ON %s = $1 AND %s=%s`,
@@ -490,6 +492,7 @@ func (q *shtemsDB) GetShtemBajinsByLinkName(link string) ([]*domain.ShtemBajin, 
 		shtemBajinsTableComponents.shtem_id,
 		shtemBajinsTableComponents.name,
 		shtemBajinsTableComponents.number,
+		shtemBajinsTableComponents.is_ready,
 		shtemBajinsTableName,                // TABLE NAME
 		shtemsTableName,                     // JOIN TABLE NAME
 		shtemsTableComponents.link_name,     // MATCH
@@ -497,9 +500,40 @@ func (q *shtemsDB) GetShtemBajinsByLinkName(link string) ([]*domain.ShtemBajin, 
 		shtemBajinsTableComponents.shtem_id, // MATCH
 	)
 
-	log.Println(query)
+	rows, err := q.db.Query(q.ctx, query, link)
+	if err != nil {
+		return nil, domain.NewError().SetError(err)
+	}
+	defer rows.Close()
 
-	return nil, nil
+	var result = []*domain.ShtemBajin{}
+
+	for rows.Next() {
+		var id, shtem_id int64
+		var name string
+		var number int
+		var isReady bool
+
+		if err := rows.Scan(
+			&id,
+			&shtem_id,
+			&name,
+			&number,
+			&isReady,
+		); err != nil {
+			return nil, domain.NewError().SetError(err)
+		}
+
+		result = append(result, &domain.ShtemBajin{
+			Id:      id,
+			ShtemId: shtem_id,
+			Name:    name,
+			Number:  number,
+			IsReady: isReady,
+		})
+	}
+
+	return result, nil
 }
 
 func NewShtemsDB(ctx context.Context, db *postgresclient.PostgresDB) *shtemsDB {

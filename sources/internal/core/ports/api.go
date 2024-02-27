@@ -9,4 +9,5 @@ type APIHandler interface {
 	FindQuestion() gin.HandlerFunc
 	FindBajin() gin.HandlerFunc
 	GetShtems() gin.HandlerFunc
+	GetShtemBajins() gin.HandlerFunc
 }
