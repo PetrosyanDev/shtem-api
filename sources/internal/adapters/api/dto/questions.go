@@ -88,8 +88,6 @@ func (r *DeleteQuestionRequest) ToDomain(p *domain.Question) domain.Error {
 // FIND
 type FindQuestionRequest struct {
 	Bajin         int    `json:"bajin" binding:"required"`
-	Mas           int    `json:"mas" binding:"required"`
-	Number        int    `json:"number" binding:"required"`
 	ShtemLinkName string `json:"shtemaran" binding:"required"`
 }
 
@@ -111,8 +109,6 @@ func (r *FindQuestionRequest) ToDomain(p *domain.Question, s ports.ShtemsService
 	}
 
 	p.Bajin = r.Bajin
-	p.Mas = r.Mas
-	p.Q_number = r.Number
 	p.ShtemId = shtem.Id
 
 	return nil
