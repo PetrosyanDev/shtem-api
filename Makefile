@@ -1,6 +1,6 @@
 # Erik Petrosyan ©
-RELEASE_VERSION=1.0.0
-ROLLBACK_VERSION=1.0.0
+RELEASE_VERSION=1.0.1
+ROLLBACK_VERSION=1.0.1
 
 GIT_REPO=git@github.com:PetrosyanDev/shtem-api.git
 GIT_BLD_BRANCH=main
